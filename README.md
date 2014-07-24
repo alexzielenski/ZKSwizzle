@@ -67,6 +67,10 @@ int *myIvar = &ZKHookIvar(self, int, "_myIvar");
 *myIvar = 3;
 ```
 
+# "Swizzling the right way"
+
+Some say that using `method_exchangeImplementations` causes problems with the original implementation being passed a replaced `_cmd` such as `old_description` which would be the new selector for the original implementation of a swizzled `description`. ZKSwizzle solves this problem with `ZKOrig(...)` which passes the correct selector to the original implementation and thus avoids this problem.
+
 #License
 
 ZKSwizzle is available on the permissive [MIT License](http://opensource.org/licenses/mit-license.php)

@@ -28,6 +28,7 @@
 - (NSString *)instanceMethod { return @"original"; }
 - (NSString *)description { return @"original"; }
 - (int)ivar { return ivar; }
+- (NSString *)selectorName { return NSStringFromSelector(_cmd); }
 @end
 
 @interface ZKSwizzleClass : ZKOriginalClass @end
@@ -63,6 +64,8 @@
     return (int)ZKOrig();
 }
 
+- (NSString *)selectorName { return ZKOrig(); }
+
 @end
 
 @interface ZKTests : XCTestCase
@@ -83,6 +86,7 @@
     XCTAssertNotEqualObjects([instance description], @"original", @"calling super on instance");
     XCTAssertEqual([ ZKOriginalClass isSubclassOfClass:[NSString class]], YES, @"calling super imp on class");
     XCTAssertEqualObjects([instance className], @"ZKOriginalClass_replaced", @"calling original imp on instance");
+    XCTAssertEqualObjects([instance selectorName], @"selectorName", @"_cmd correct on original imps");
     XCTAssertEqual([instance ivar], 3, @"hooking ivars");
 }
 
