@@ -10,21 +10,24 @@
 #import <XCTest/XCTest.h>
 #import "ZKSwizzle.h"
 
-@interface ZKOriginalClass : NSObject
+@interface ZKOriginalClass : NSObject {
+    int ivar;
+}
 + (NSString *)classMethod;
 + (NSString *)description;
 - (NSString *)instanceMethod;
 - (NSString *)description;
+- (int)ivar;
 @end
 
 @implementation ZKOriginalClass
-
+- (id)init { if ((self = [super init])) { ivar = 1; } return self; }
 + (BOOL)isSubclassOfClass:(Class)aClass { return YES; }
 + (NSString *)classMethod { return @"original"; }
 + (NSString *)description { return @"original"; }
 - (NSString *)instanceMethod { return @"original"; }
 - (NSString *)description { return @"original"; }
-
+- (int)ivar { return ivar; }
 @end
 
 @interface ZKSwizzleClass : ZKOriginalClass @end
@@ -54,6 +57,12 @@
     return ZKSuper();
 }
 
+- (int)ivar {
+    int *hooked = &ZKHookIvar(self, int, "ivar");
+    *hooked = 3;
+    return (int)ZKOrig();
+}
+
 @end
 
 @interface ZKTests : XCTestCase
@@ -74,6 +83,7 @@
     XCTAssertNotEqualObjects([instance description], @"original", @"calling super on instance");
     XCTAssertEqual([ ZKOriginalClass isSubclassOfClass:[NSString class]], YES, @"calling super imp on class");
     XCTAssertEqualObjects([instance className], @"ZKOriginalClass_replaced", @"calling original imp on instance");
+    XCTAssertEqual([instance ivar], 3, @"hooking ivars");
 }
 
 @end
