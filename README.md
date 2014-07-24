@@ -29,7 +29,7 @@ ZKSwizzle also provides macros for calling the original implementation if need b
 + (BOOL)isSubclassOfClass:(Class)aClass { return (BOOL)ZKOrig(); }
 
 // Returns "original_replaced"
-- (NSString *)className { return [ORIG() stringByAppendingString:@"_replaced"]; }
+- (NSString *)className { return [ZKOrig() stringByAppendingString:@"_replaced"]; }
 
 // Returns "replaced" when called on the OriginalObject class
 + (NSString *)classMethod { return @"replaced"; }
