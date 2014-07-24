@@ -42,8 +42,8 @@
 // returns the original implementation of the superclass of the object swizzled
 #define ZKSuper(...) (ZKSuperImplementation(self, _cmd))(self, _cmd, ##__VA_ARGS__)
 
-#define ZKSwizzle(SOURCE, DESTINATION) [ZKSwizzler swizzleClass:ZKClass(SOURCE) forClass:ZKClass(DESTINATION)]
-#define ZKSwizzleClass(SOURCE) [ZKSwizzler swizzleClass:ZKClass(SOURCE)]
+#define ZKSwizzle(SOURCE, DESTINATION) [ZKSwizzle swizzleClass:ZKClass(SOURCE) forClass:ZKClass(DESTINATION)]
+#define ZKSwizzleClass(SOURCE) [ZKSwizzle swizzleClass:ZKClass(SOURCE)]
 
 // thanks OBJC_OLD_DISPATCH_PROTOTYPES=0
 typedef id (*ZKIMP)(id, SEL, ...);

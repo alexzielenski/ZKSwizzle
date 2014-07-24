@@ -72,7 +72,7 @@
 
 - (void)setUp {
     [super setUp];
-    [ZKSwizzle swizzleClass:ZKClass(ZKSwizzleClass)];
+    ZKSwizzleClass(ZKSwizzleClass);
 }
 
 - (void)testExample {
