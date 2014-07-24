@@ -34,7 +34,8 @@ ZKSwizzle also provides macros for calling the original implementation if need b
 	// Returns "replaced" when called on the OriginalObject class
 	+ (NSString *)classMethod { return @"replaced"; }
 	
-	// Returns the default description implemented by NSObject	+ (NSString *)description { return ZKSuper(); }
+	// Returns the default description implemented by NSObject
+	+ (NSString *)description { return ZKSuper(); }
 	
 	// Returns "replaced" when called on an instance of OriginalObject
 	- (NSString *)instanceMethod { return @"replaced"; }
