@@ -1,0 +1,374 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FA3527851980EB8300EF2D5B /* ZKSwizzle.h in Headers */ = {isa = PBXBuildFile; fileRef = FA3527841980EB8300EF2D5B /* ZKSwizzle.h */; };
+		FA3527871980EB8300EF2D5B /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FA3527861980EB8300EF2D5B /* ZKSwizzle.m */; };
+		FA35278D1980EB8300EF2D5B /* libZKSwizzle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3527811980EB8300EF2D5B /* libZKSwizzle.a */; };
+		FA35279C1980EC8C00EF2D5B /* ZKTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FA35279B1980EC8C00EF2D5B /* ZKTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FA35278E1980EB8300EF2D5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA3527791980EB8300EF2D5B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA3527801980EB8300EF2D5B;
+			remoteInfo = ZKSwizzle;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		FA3527811980EB8300EF2D5B /* libZKSwizzle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libZKSwizzle.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA3527841980EB8300EF2D5B /* ZKSwizzle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZKSwizzle.h; sourceTree = "<group>"; };
+		FA3527861980EB8300EF2D5B /* ZKSwizzle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZKSwizzle.m; sourceTree = "<group>"; };
+		FA35278C1980EB8300EF2D5B /* ZKSwizzleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZKSwizzleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA3527921980EB8300EF2D5B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FA35279B1980EC8C00EF2D5B /* ZKTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZKTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FA35277E1980EB8300EF2D5B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA3527891980EB8300EF2D5B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA35278D1980EB8300EF2D5B /* libZKSwizzle.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FA3527781980EB8300EF2D5B = {
+			isa = PBXGroup;
+			children = (
+				FA3527831980EB8300EF2D5B /* ZKSwizzle */,
+				FA3527901980EB8300EF2D5B /* ZKSwizzleTests */,
+				FA3527821980EB8300EF2D5B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FA3527821980EB8300EF2D5B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FA3527811980EB8300EF2D5B /* libZKSwizzle.a */,
+				FA35278C1980EB8300EF2D5B /* ZKSwizzleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FA3527831980EB8300EF2D5B /* ZKSwizzle */ = {
+			isa = PBXGroup;
+			children = (
+				FA3527841980EB8300EF2D5B /* ZKSwizzle.h */,
+				FA3527861980EB8300EF2D5B /* ZKSwizzle.m */,
+			);
+			path = ZKSwizzle;
+			sourceTree = "<group>";
+		};
+		FA3527901980EB8300EF2D5B /* ZKSwizzleTests */ = {
+			isa = PBXGroup;
+			children = (
+				FA35279B1980EC8C00EF2D5B /* ZKTests.m */,
+				FA3527911980EB8300EF2D5B /* Supporting Files */,
+			);
+			path = ZKSwizzleTests;
+			sourceTree = "<group>";
+		};
+		FA3527911980EB8300EF2D5B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FA3527921980EB8300EF2D5B /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FA35277F1980EB8300EF2D5B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA3527851980EB8300EF2D5B /* ZKSwizzle.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		FA3527801980EB8300EF2D5B /* ZKSwizzle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA3527951980EB8300EF2D5B /* Build configuration list for PBXNativeTarget "ZKSwizzle" */;
+			buildPhases = (
+				FA35277D1980EB8300EF2D5B /* Sources */,
+				FA35277E1980EB8300EF2D5B /* Frameworks */,
+				FA35277F1980EB8300EF2D5B /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ZKSwizzle;
+			productName = ZKSwizzle;
+			productReference = FA3527811980EB8300EF2D5B /* libZKSwizzle.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		FA35278B1980EB8300EF2D5B /* ZKSwizzleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA3527981980EB8300EF2D5B /* Build configuration list for PBXNativeTarget "ZKSwizzleTests" */;
+			buildPhases = (
+				FA3527881980EB8300EF2D5B /* Sources */,
+				FA3527891980EB8300EF2D5B /* Frameworks */,
+				FA35278A1980EB8300EF2D5B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA35278F1980EB8300EF2D5B /* PBXTargetDependency */,
+			);
+			name = ZKSwizzleTests;
+			productName = ZKSwizzleTests;
+			productReference = FA35278C1980EB8300EF2D5B /* ZKSwizzleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FA3527791980EB8300EF2D5B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = "Alexander S Zielenski";
+				TargetAttributes = {
+					FA3527801980EB8300EF2D5B = {
+						CreatedOnToolsVersion = 6.0;
+					};
+					FA35278B1980EB8300EF2D5B = {
+						CreatedOnToolsVersion = 6.0;
+						TestTargetID = FA3527801980EB8300EF2D5B;
+					};
+				};
+			};
+			buildConfigurationList = FA35277C1980EB8300EF2D5B /* Build configuration list for PBXProject "ZKSwizzle" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = FA3527781980EB8300EF2D5B;
+			productRefGroup = FA3527821980EB8300EF2D5B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FA3527801980EB8300EF2D5B /* ZKSwizzle */,
+				FA35278B1980EB8300EF2D5B /* ZKSwizzleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FA35278A1980EB8300EF2D5B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FA35277D1980EB8300EF2D5B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA3527871980EB8300EF2D5B /* ZKSwizzle.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA3527881980EB8300EF2D5B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA35279C1980EC8C00EF2D5B /* ZKTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FA35278F1980EB8300EF2D5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA3527801980EB8300EF2D5B /* ZKSwizzle */;
+			targetProxy = FA35278E1980EB8300EF2D5B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FA3527931980EB8300EF2D5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FA3527941980EB8300EF2D5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FA3527961980EB8300EF2D5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		FA3527971980EB8300EF2D5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		FA3527991980EB8300EF2D5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = ZKSwizzleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		FA35279A1980EB8300EF2D5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = ZKSwizzleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FA35277C1980EB8300EF2D5B /* Build configuration list for PBXProject "ZKSwizzle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA3527931980EB8300EF2D5B /* Debug */,
+				FA3527941980EB8300EF2D5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA3527951980EB8300EF2D5B /* Build configuration list for PBXNativeTarget "ZKSwizzle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA3527961980EB8300EF2D5B /* Debug */,
+				FA3527971980EB8300EF2D5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		FA3527981980EB8300EF2D5B /* Build configuration list for PBXNativeTarget "ZKSwizzleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA3527991980EB8300EF2D5B /* Debug */,
+				FA35279A1980EB8300EF2D5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FA3527791980EB8300EF2D5B /* Project object */;
+}
