@@ -52,8 +52,8 @@ ZKSwizzle also provides macros for calling the original implementation if need b
 	
 Call this somewhere to initialize the swizzling:
 ```objc
-// SWIZZLE is a macro shorthand for calling +swizzleClass:forClass: on ZKSwizzle
-SWIZZLE(ReplacementObject, OriginalObject);
+// ZKSwizzle(SOURCE, DST) is a macro shorthand for calling +swizzleClass:forClass: on ZKSwizzle
+ZKSwizzle(ReplacementObject, OriginalObject);
 ```
 
 ZKSwizzle also has macros in place for hooking instance variables:
