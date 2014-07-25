@@ -36,11 +36,27 @@
 #define ZKClass(CLASS) objc_getClass(#CLASS)
 
 // returns the value of an instance variable.
-#define ZKHookIvar(OBJECT, TYPE, NAME) (*(TYPE *)ZKIvarPointer(OBJECT, NAME))
+#if !__has_feature(objc_arc)
+    #define ZKHookIvar(OBJECT, TYPE, NAME) (*(TYPE *)ZKIvarPointer(OBJECT, NAME))
+#else
+    #define ZKHookIvar(OBJECT, TYPE, NAME) \
+        _Pragma("clang diagnostic push") \
+        _Pragma("clang diagnostic ignored \"-Wignored-attributes\"") \
+            (*(__unsafe_unretained TYPE *)ZKIvarPointer(OBJECT, NAME)) \
+        _Pragma("clang diagnostic pop")
+#endif
 // returns the original implementation of the swizzled function or null or not found
-#define ZKOrig(...) (ZKOriginalImplementation(self, _cmd))(self, _cmd, ##__VA_ARGS__)
+#if !__has_feature(objc_arc)
+    #define ZKOrig(...) (ZKOriginalImplementation(self, _cmd))(self, _cmd, ##__VA_ARGS__)
+#else
+    #define ZKOrig(TYPE, ...) ((TYPE (*)(id, SEL, ...))(ZKOriginalImplementation(self, _cmd)))(self, _cmd, ##__VA_ARGS__)
+#endif
 // returns the original implementation of the superclass of the object swizzled
-#define ZKSuper(...) (ZKSuperImplementation(self, _cmd))(self, _cmd, ##__VA_ARGS__)
+#if !__has_feature(objc_arc)
+    #define ZKSuper(...) (ZKSuperImplementation(self, _cmd))(self, _cmd, ##__VA_ARGS__)
+#else
+    #define ZKSuper(TYPE, ...) ((TYPE (*)(id, SEL, ...))(ZKSuperImplementation(self, _cmd)))(self, _cmd, ##__VA_ARGS__)
+#endif
 
 #define ZKSwizzle(SOURCE, DESTINATION) [ZKSwizzle swizzleClass:ZKClass(SOURCE) forClass:ZKClass(DESTINATION)]
 #define ZKSwizzleClass(SOURCE) [ZKSwizzle swizzleClass:ZKClass(SOURCE)]
