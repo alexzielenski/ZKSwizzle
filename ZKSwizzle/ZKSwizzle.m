@@ -8,7 +8,7 @@
 
 #import "ZKSwizzle.h"
 
-#define kOPOrigPrefix @"_old"
+#define kZKOrigPrefix @"_ZK_old_"
 
 void *ZKIvarPointer(id self, const char *name) {
     Ivar ivar = class_getInstanceVariable(object_getClass(self), name);
@@ -20,7 +20,7 @@ ZKIMP ZKOriginalImplementation(id object, SEL sel) {
     if (cls == NULL)
         return NULL;
     
-    SEL oldSel = NSSelectorFromString([kOPOrigPrefix stringByAppendingString: NSStringFromSelector(sel)]);
+    SEL oldSel = NSSelectorFromString([kZKOrigPrefix stringByAppendingString: NSStringFromSelector(sel)]);
     // works for class methods and instance methods because we call object_getClass
     // which gives us a metaclass if the object is a Class which a Class is an instace of
     Method method = class_getInstanceMethod(cls, oldSel);
@@ -86,7 +86,7 @@ BOOL enumerateMethods(Class destination, Class source) {
         // We only swizzle methods that are implemented
         if (class_respondsToSelector(destination, selector)) {
             // Since the prefix is valid, get the name of the method to swizzle on the destination class by removing the prefix
-            SEL destinationSelector = NSSelectorFromString([kOPOrigPrefix stringByAppendingString:methodName]);
+            SEL destinationSelector = NSSelectorFromString([kZKOrigPrefix stringByAppendingString:methodName]);
             Method originalMethod = class_getInstanceMethod(destination, selector);
             
             const char *originalType = method_getTypeEncoding(originalMethod);
