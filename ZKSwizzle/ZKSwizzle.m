@@ -8,7 +8,7 @@
 
 #import "ZKSwizzle.h"
 
-#define kOPOrigPrefix @"_old"
+#define kZKOrigPrefix @"_ZK_old_"
 
 void *ZKIvarPointer(id self, const char *name) {
     Ivar ivar = class_getInstanceVariable(object_getClass(self), name);
@@ -20,7 +20,7 @@ ZKIMP ZKOriginalImplementation(id object, SEL sel) {
     if (cls == NULL)
         return NULL;
     
-    SEL oldSel = NSSelectorFromString([kOPOrigPrefix stringByAppendingString: NSStringFromSelector(sel)]);
+    SEL oldSel = NSSelectorFromString([kZKOrigPrefix stringByAppendingString: NSStringFromSelector(sel)]);
     // works for class methods and instance methods because we call object_getClass
     // which gives us a metaclass if the object is a Class which a Class is an instace of
     Method method = class_getInstanceMethod(cls, oldSel);
