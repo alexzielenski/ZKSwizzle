@@ -34,8 +34,12 @@ ZKIMP ZKSuperImplementation(id object, SEL sel) {
     Class cls = object_getClass(object);
     if (cls == NULL)
         return NULL;
-    if (class_isMetaClass(cls))
+
+    BOOL classMethod = NO;
+    if (class_isMetaClass(cls)) {
         cls = object;
+        classMethod = YES;
+    }
     
     cls = class_getSuperclass(cls);
     
@@ -44,7 +48,7 @@ ZKIMP ZKSuperImplementation(id object, SEL sel) {
         return NULL;
     }
     
-    Method method = class_getInstanceMethod(cls, sel);
+    Method method = classMethod ?  class_getClassMethod(cls, sel) : class_getInstanceMethod(cls, sel);
     if (method == NULL)
         return NULL;
     
