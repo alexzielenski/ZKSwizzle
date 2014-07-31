@@ -35,11 +35,11 @@
 @implementation ZKSwizzleClass
 
 + (BOOL)isSubclassOfClass:(Class)aClass {
-    return (BOOL)ZKOrig();
+    return ZKOrig(BOOL);
 }
 
 - (NSString *)className {
-    return [ZKOrig() stringByAppendingString:@"_replaced"];
+    return [ZKOrig(NSString *) stringByAppendingString:@"_replaced"];
 }
 
 + (NSString *)classMethod {
@@ -47,7 +47,7 @@
 }
 
 + (NSString *)description {
-    return ZKSuper();
+    return ZKSuper(NSString *);
 }
 
 - (NSString *)instanceMethod {
@@ -55,16 +55,16 @@
 }
 
 - (NSString *)description {
-    return ZKSuper();
+    return ZKSuper(NSString *);
 }
 
 - (int)ivar {
     int *hooked = &ZKHookIvar(self, int, "ivar");
     *hooked = 3;
-    return (int)ZKOrig();
+    return ZKOrig(int);
 }
 
-- (NSString *)selectorName { return ZKOrig(); }
+- (NSString *)selectorName { return ZKOrig(NSString *); }
 
 @end
 
