@@ -47,9 +47,9 @@
 #endif
 // returns the original implementation of the swizzled function or null or not found
 #if !__has_feature(objc_arc)
-    #define ZKOrig(...) (ZKOriginalImplementation(self, _cmd))(self, _cmd, ##__VA_ARGS__)
+    #define ZKOrig(...) (ZKOriginalImplementation(self, _cmd, __PRETTY_FUNCTION__))(self, _cmd, ##__VA_ARGS__)
 #else
-    #define ZKOrig(TYPE, ...) ((TYPE (*)(id, SEL, ...))(ZKOriginalImplementation(self, _cmd)))(self, _cmd, ##__VA_ARGS__)
+    #define ZKOrig(TYPE, ...) ((TYPE (*)(id, SEL, ...))(ZKOriginalImplementation(self, _cmd, __PRETTY_FUNCTION__)))(self, _cmd, ##__VA_ARGS__)
 #endif
 // returns the original implementation of the superclass of the object swizzled
 #if !__has_feature(objc_arc)
@@ -67,7 +67,7 @@ typedef id (*ZKIMP)(id, SEL, ...);
 // returns a pointer to the instance variable "name" on the object
 void *ZKIvarPointer(id self, const char *name);
 // returns the original implementation of a method with selector "sel" of an object hooked by the methods below
-ZKIMP ZKOriginalImplementation(id object, SEL sel);
+ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info);
 // returns the implementation of a method with selector "sel" of the superclass of object
 ZKIMP ZKSuperImplementation(id object, SEL sel);
 
