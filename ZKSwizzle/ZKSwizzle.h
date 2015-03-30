@@ -61,6 +61,23 @@
 #define ZKSwizzle(SOURCE, DESTINATION) [ZKSwizzle swizzleClass:ZKClass(SOURCE) forClass:ZKClass(DESTINATION)]
 #define ZKSwizzleClass(SOURCE) [ZKSwizzle swizzleClass:ZKClass(SOURCE)]
 
+// Ripped off from MobileSubstrate
+// Bootstraps your swizzling class so that it requires no setup
+// outside of this macro call
+// If you override +load you must call ZKSwizzle(CLASS_NAME, TARGET_CLASS)
+// yourself, otherwise the swizzling would not take place
+#define ZKSwizzleInterface(CLASS_NAME, TARGET_CLASS, SUPERCLASS) \
+    @interface _$ ## CLASS_NAME : SUPERCLASS @end \
+    @implementation _$ ## CLASS_NAME \
+        + (void)initialize {} \
+    @end \
+    @interface CLASS_NAME : _$ ## CLASS_NAME @end \
+    @implementation CLASS_NAME (ZKSWIZZLE) \
+        + (void)load { \
+            ZKSwizzle(CLASS_NAME, TARGET_CLASS); \
+        } \
+    @end
+
 // thanks OBJC_OLD_DISPATCH_PROTOTYPES=0
 typedef id (*ZKIMP)(id, SEL, ...);
 
