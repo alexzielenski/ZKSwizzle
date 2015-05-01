@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
+#include <sys/cdefs.h>
 
 // This is a class for streamlining swizzling. Simply create a new class of any name you want and
 // this will swizzle any methods with a prefix defined in the +prefix method
@@ -81,12 +82,16 @@
 // thanks OBJC_OLD_DISPATCH_PROTOTYPES=0
 typedef id (*ZKIMP)(id, SEL, ...);
 
+__BEGIN_DECLS
+
 // returns a pointer to the instance variable "name" on the object
 void *ZKIvarPointer(id self, const char *name);
 // returns the original implementation of a method with selector "sel" of an object hooked by the methods below
 ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info);
 // returns the implementation of a method with selector "sel" of the superclass of object
 ZKIMP ZKSuperImplementation(id object, SEL sel);
+
+__END_DECLS
 
 @interface ZKSwizzle : NSObject
 // hooks all the implemented methods of source with destination
