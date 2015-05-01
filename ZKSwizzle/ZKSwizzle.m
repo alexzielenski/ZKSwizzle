@@ -50,12 +50,16 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
     // which gives us a metaclass if the object is a Class which a Class is an instace of
     Method method = class_isMetaClass(dest) ? class_getClassMethod(cls, sel) : class_getInstanceMethod(cls, sel);
     if (method == NULL) {
-        [NSException raise:@"Failed to retrieve implementation" format:@"Got null for the target class %@ with selector %@", sig, NSStringFromSelector(sel)];
+        [NSException raise:@"Failed to retrieve method" format:@"Got null for the source class %@ with selector %@", sig, NSStringFromSelector(sel)];
         return NULL;
     }
     
-    return (ZKIMP)method_getImplementation(method);
-}
+    ZKIMP implementation = (ZKIMP)method_getImplementation(method);
+    if (implementation == NULL) {
+        [NSException raise:@"Failed to get implementation" format:@"The objective-c runtime could not get the implementation for %@ on the class %@. There is no fix for this", NSStringFromClass(cls), NSStringFromSelector(sel)];
+    }
+    
+    return implementation;}
 
 ZKIMP ZKSuperImplementation(id object, SEL sel) {
     if (sel == NULL || object == NULL) {
@@ -83,11 +87,16 @@ ZKIMP ZKSuperImplementation(id object, SEL sel) {
     
     Method method = class_getInstanceMethod(cls, sel);
     if (method == NULL) {
-        [NSException raise:@"Failed to retrieve implementation" format:@"We could not find the super implementation for the class %@ and selector %@, are you sure it exists?", object, NSStringFromSelector(sel)];
+        [NSException raise:@"Failed to retrieve method" format:@"We could not find the super implementation for the class %@ and selector %@, are you sure it exists?", NSStringFromClass(cls), NSStringFromSelector(sel)];
         return NULL;
     }
     
-    return (ZKIMP)method_getImplementation(method);
+    ZKIMP implementation = (ZKIMP)method_getImplementation(method);
+    if (implementation == NULL) {
+        [NSException raise:@"Failed to get implementation" format:@"The objective-c runtime could not get the implementation for %@ on the class %@. There is no fix for this", NSStringFromClass(cls), NSStringFromSelector(sel)];
+    }
+    
+    return implementation;
 }
 
 static BOOL enumerateMethods(Class, Class);
