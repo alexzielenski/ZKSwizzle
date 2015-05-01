@@ -10,6 +10,10 @@
 #import <XCTest/XCTest.h>
 #import "ZKSwizzle.h"
 
+id bloxecute(id (^block)()) {
+    return block();
+}
+
 @interface ZKOriginalClass : NSObject {
     int ivar;
 }
@@ -64,7 +68,13 @@
     return ZKOrig(int);
 }
 
-- (NSString *)selectorName { return ZKOrig(NSString *); }
+- (NSString *)selectorName {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    return bloxecute(^{
+        NSLog(@"%s", __PRETTY_FUNCTION__);
+        return ZKOrig(NSString *);
+    });
+}
 
 @end
 

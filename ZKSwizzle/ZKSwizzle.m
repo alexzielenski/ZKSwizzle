@@ -59,7 +59,10 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
     if (sel == NULL)
         return NULL;
 
-    NSString *sig = @(info + 2);
+    NSString *sig = @(info);
+    NSRange bracket = [sig rangeOfString:@"["];
+    sig = [sig substringFromIndex:bracket.location + bracket.length];
+    
     NSRange brk = [sig rangeOfString:@" "];
     sig = [sig substringToIndex:brk.location];
 
