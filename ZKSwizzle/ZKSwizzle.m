@@ -27,6 +27,10 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
 
     NSString *sig = @(info);
     NSRange bracket = [sig rangeOfString:@"["];
+    if (bracket.location != NSNotFound || bracket.length != 1) {
+        NSLog(@"Couldn't find swizzle class for info: %s", info);
+        return NULL;
+    }
     sig = [sig substringFromIndex:bracket.location + bracket.length];
     
     NSRange brk = [sig rangeOfString:@" "];
