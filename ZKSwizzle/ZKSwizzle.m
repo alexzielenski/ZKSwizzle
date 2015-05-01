@@ -7,15 +7,6 @@
 //
 
 #import "ZKSwizzle.h"
-
-#define kZKOrigPrefix @"_ZK_old_"
-
-// give it the swizzle sourceclass and it will give back a selector
-// prefixed with the ZKPrefix and the name of the swizzle source class
-static SEL destinationSelectorForClassAndSelector(Class cls, SEL sel) {
-    return NSSelectorFromString([kZKOrigPrefix stringByAppendingFormat:@"%s_%@", class_getName(cls), NSStringFromSelector(sel)]);
-}
-
 void *ZKIvarPointer(id self, const char *name) {
     Ivar ivar = class_getInstanceVariable(object_getClass(self), name);
     return ivar == NULL ? NULL : (__bridge void *)self + ivar_getOffset(ivar);
@@ -23,36 +14,11 @@ void *ZKIvarPointer(id self, const char *name) {
 
 // takes __PRETTY_FUNCTION__ for info which gives the name of the swizzle source class
 /*
- We need to get the name of the swizzle source class so we can namespace original function implementations correctly
- If we subclassed a class we already swizzled and both implementations called ZKOrig without namespacing it would
- cause an infinite loop of calling the same method this way the original method of the superclass gets placed in 
- _ZK_old_Superclass_selectorName and the original method of its subclass which would be the implementation of the swizzled
- superclass gets placed in _ZK_old_Subclass_selectorName. For example:
- 
- Assume that Superclass is a class which implements -swizzledMethod and Subclass is a subclass of Superclass
- which doesn't override -swizzledMethod, meaning when we place the original method into another selector while swizzling,
- it uses Superclass's implementation which has been swizzled
 
- // ZKOrig calls are expanded in this example
- @implementation Superclass
- - (void)swizzledMethod {
-    // call the original method which Superclass swizzles
-    [self _ZK_old_Superclass_swizzledMethod];
- }
- @end
-
- @implementation Subclass
- - (void)swizzledMethod {
-    // call the superclass implementation of swizzledMethod since it isnt redefined on the original Subclass
-    [self _ZK_old_Subclass_swizzledMethod];
- }
- @end
- 
- A stack trace of calling -swizzledMethod on Subclass would look like this:
- 
- -swizzledMethod
- -_ZK_old_Subclass_swizzledMethod
- -_ZK_old_Superclass_swizzledMethod
+ We add the original implementation onto the swizzle class
+ On ZKOrig, we use __PRETTY_FUNCTION__ to get the name of the swizzle class
+ Then we get the implementation of that selector on the swizzle class
+ Then we call it directly, passing in the correct selector and self
  
  */
 ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
@@ -71,12 +37,13 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
     if (cls == NULL || dest == NULL)
         return NULL;
 
-    SEL oldSel = destinationSelectorForClassAndSelector(cls, sel);
     // works for class methods and instance methods because we call object_getClass
     // which gives us a metaclass if the object is a Class which a Class is an instace of
-    Method method = class_getInstanceMethod(dest, oldSel);
-    if (method == NULL)
+    Method method = class_isMetaClass(dest) ? class_getClassMethod(cls, sel) : class_getInstanceMethod(cls, sel);
+    if (method == NULL) {
+        NSLog(@"null method for %@ on %@", sig, NSStringFromSelector(sel));
         return NULL;
+    }
     
     return (ZKIMP)method_getImplementation(method);
 }
@@ -116,7 +83,7 @@ static BOOL enumerateMethods(Class, Class);
 
 + (BOOL)swizzleClass:(Class)source forClass:(Class)destination {
     BOOL success = enumerateMethods(destination, source);
-    // The above method only gets instance variables. Do the same method for the metaclass of the class
+    // The above method only gets instance methods. Do the same method for the metaclass of the class
     success     &= enumerateMethods(object_getClass(destination), object_getClass(source));
     
     return success;
@@ -135,7 +102,6 @@ static BOOL enumerateMethods(Class destination, Class source) {
 
         // We only swizzle methods that are implemented
         if (class_respondsToSelector(destination, selector)) {
-            SEL destinationSelector = destinationSelectorForClassAndSelector(source, selector);
             Method originalMethod = class_getInstanceMethod(destination, selector);
 
             const char *originalType = method_getTypeEncoding(originalMethod);
@@ -149,14 +115,8 @@ static BOOL enumerateMethods(Class destination, Class source) {
             
             // We are re-adding the destination selector because it could be on a superclass and not on the class itself. This method could fail
             class_addMethod(destination, selector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
-            // Add the implementation of the replaced method at the prefixed selector
-            class_addMethod(destination, destinationSelector, method_getImplementation(method), method_getTypeEncoding(method));
             
-            // Retrieve the two new methods at their respective paths
-            Method m1 = class_getInstanceMethod(destination, selector);
-            Method m2 = class_getInstanceMethod(destination, destinationSelector);
-            
-            method_exchangeImplementations(m1, m2);
+            method_exchangeImplementations(class_getInstanceMethod(destination, selector), method);
             
             success &= YES;
         } else {

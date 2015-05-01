@@ -69,11 +69,20 @@ id bloxecute(id (^block)()) {
 }
 
 - (NSString *)selectorName {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     return bloxecute(^{
-        NSLog(@"%s", __PRETTY_FUNCTION__);
         return ZKOrig(NSString *);
     });
+}
+
+@end
+
+@interface ZKSwizzleClass2 : ZKOriginalClass
+
+@end
+@implementation ZKSwizzleClass2
+
+- (NSString *)selectorName {
+    return [NSString stringWithFormat:@"BREH: %@", ZKOrig(NSString *)];
 }
 
 @end
@@ -86,6 +95,7 @@ id bloxecute(id (^block)()) {
 - (void)setUp {
     [super setUp];
     ZKSwizzleClass(ZKSwizzleClass);
+    ZKSwizzleClass(ZKSwizzleClass2);
 }
 
 - (void)testExample {
@@ -96,7 +106,7 @@ id bloxecute(id (^block)()) {
     XCTAssertNotEqualObjects([instance description], @"original", @"calling super on instance");
     XCTAssertEqual([ ZKOriginalClass isSubclassOfClass:[NSString class]], YES, @"calling super imp on class");
     XCTAssertEqualObjects([instance className], @"ZKOriginalClass_replaced", @"calling original imp on instance");
-    XCTAssertEqualObjects([instance selectorName], @"selectorName", @"_cmd correct on original imps");
+    XCTAssertEqualObjects([instance selectorName], @"BREH: selectorName", @"_cmd correct on original imps");
     XCTAssertEqual([instance ivar], 3, @"hooking ivars");
 }
 
