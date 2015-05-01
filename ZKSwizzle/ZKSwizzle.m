@@ -22,15 +22,18 @@ void *ZKIvarPointer(id self, const char *name) {
  
  */
 ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
-    if (sel == NULL)
+    if (sel == NULL || self == NULL || info == NULL) {
+        [NSException raise:@"Invalid Arguments" format:@"One of self: %@, self: %@, or info: %s is NULL", self, NSStringFromSelector(sel), info];
         return NULL;
+    }
 
     NSString *sig = @(info);
     NSRange bracket = [sig rangeOfString:@"["];
-    if (bracket.location != NSNotFound || bracket.length != 1) {
-        NSLog(@"Couldn't find swizzle class for info: %s", info);
+    if (bracket.location == NSNotFound || bracket.length != 1) {
+        [NSException raise:@"Failed to parse info" format:@"Couldn't find swizzle class for info: %s", info];
         return NULL;
     }
+    
     sig = [sig substringFromIndex:bracket.location + bracket.length];
     
     NSRange brk = [sig rangeOfString:@" "];
@@ -38,14 +41,16 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
 
     Class cls = objc_getClass(sig.UTF8String);
     Class dest = object_getClass(self);
-    if (cls == NULL || dest == NULL)
+    if (cls == NULL || dest == NULL) {
+        [NSException raise:@"Failed obtain class pair" format:@"src: %@ | dst: %@ | sel: %@", NSStringFromClass(cls), NSStringFromClass(dest), NSStringFromSelector(sel)];
         return NULL;
+    }
 
     // works for class methods and instance methods because we call object_getClass
     // which gives us a metaclass if the object is a Class which a Class is an instace of
     Method method = class_isMetaClass(dest) ? class_getClassMethod(cls, sel) : class_getInstanceMethod(cls, sel);
     if (method == NULL) {
-        NSLog(@"null method for %@ on %@", sig, NSStringFromSelector(sel));
+        [NSException raise:@"Failed to retrieve implementation" format:@"Got null for the target class %@ with selector %@", sig, NSStringFromSelector(sel)];
         return NULL;
     }
     
@@ -53,26 +58,34 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
 }
 
 ZKIMP ZKSuperImplementation(id object, SEL sel) {
-    Class cls = object_getClass(object);
-    if (cls == NULL)
+    if (sel == NULL || object == NULL) {
+        [NSException raise:@"Invalid Arguments" format:@"One of self: %@, self: %@ is NULL", object, NSStringFromSelector(sel)];
         return NULL;
+    }
+    
+    Class cls = object_getClass(object);
+    if (cls == NULL) {
+        [NSException raise:@"Invalid Argument" format:@"Could not obtain class for the passed object"];
+        return NULL;
+    }
 
-    BOOL classMethod = NO;
     if (class_isMetaClass(cls)) {
         cls = object;
-        classMethod = YES;
     }
     
     cls = class_getSuperclass(cls);
     
     // This is a root class, it has no super class
     if (cls == NULL) {
+        [NSException raise:@"Invalid Argument" format:@"Could not obtain superclass for the passed object"];
         return NULL;
     }
     
-    Method method = classMethod ?  class_getClassMethod(cls, sel) : class_getInstanceMethod(cls, sel);
-    if (method == NULL)
+    Method method = class_getInstanceMethod(cls, sel);
+    if (method == NULL) {
+        [NSException raise:@"Failed to retrieve implementation" format:@"We could not find the super implementation for the class %@ and selector %@, are you sure it exists?", object, NSStringFromSelector(sel)];
         return NULL;
+    }
     
     return (ZKIMP)method_getImplementation(method);
 }
