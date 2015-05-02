@@ -38,11 +38,19 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
         return NULL;
     }
     
+    NSString *typeString = [sig substringWithRange:NSMakeRange(bracket.location - 1, 1)];
+    BOOL isClassMethod = [typeString isEqualToString:@"+"];
+    if (!isClassMethod && ![typeString isEqualToString:@"-"]) {
+        [NSException raise:@"Failed to parse info" format:@"Could not identify type of method to call the original implementation of (class vs instance). Bailing..."];
+        return NULL;
+    }
+    
     sig = [sig substringFromIndex:bracket.location + bracket.length];
     
     NSRange brk = [sig rangeOfString:@" "];
     sig = [sig substringToIndex:brk.location];
-
+    NSLog(@"%@: %s", sig, info);
+    
     Class cls = objc_getClass(sig.UTF8String);
     Class dest = object_getClass(self);
     if (cls == NULL || dest == NULL) {
@@ -51,10 +59,8 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
     }
 
     SEL destSel = destinationSelectorForSelector(sel, dest);
-    
-    // works for class methods and instance methods because we call object_getClass
-    // which gives us a metaclass if the object is a Class which a Class is an instace of
-    Method method = class_isMetaClass(dest) ? class_getClassMethod(cls, destSel) :  class_getInstanceMethod(cls, destSel);
+
+    Method method = isClassMethod ? class_getClassMethod(cls, destSel) :  class_getInstanceMethod(cls, destSel);
     if (method == NULL) {
         [NSException raise:@"Failed to retrieve method" format:@"Got null for the source class %@ with selector %@", sig, NSStringFromSelector(sel)];
         return NULL;
@@ -65,7 +71,8 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
         [NSException raise:@"Failed to get implementation" format:@"The objective-c runtime could not get the implementation for %@ on the class %@. There is no fix for this", NSStringFromClass(cls), NSStringFromSelector(sel)];
     }
     
-    return implementation;}
+    return implementation;
+}
 
 ZKIMP ZKSuperImplementation(id object, SEL sel) {
     if (sel == NULL || object == NULL) {
