@@ -49,7 +49,6 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
     
     NSRange brk = [sig rangeOfString:@" "];
     sig = [sig substringToIndex:brk.location];
-    NSLog(@"%@: %s", sig, info);
     
     Class cls = objc_getClass(sig.UTF8String);
     Class dest = object_getClass(self);
