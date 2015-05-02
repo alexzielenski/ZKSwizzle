@@ -12,6 +12,10 @@ void *ZKIvarPointer(id self, const char *name) {
     return ivar == NULL ? NULL : (__bridge void *)self + ivar_getOffset(ivar);
 }
 
+static SEL destinationSelectorForSelector(SEL cmd, Class dst) {
+    return NSSelectorFromString([@"_ZK_old_" stringByAppendingFormat:@"%s_%@", class_getName(dst), NSStringFromSelector(cmd)]);
+}
+
 // takes __PRETTY_FUNCTION__ for info which gives the name of the swizzle source class
 /*
 
@@ -46,9 +50,11 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
         return NULL;
     }
 
+    SEL destSel = destinationSelectorForSelector(sel, dest);
+    
     // works for class methods and instance methods because we call object_getClass
     // which gives us a metaclass if the object is a Class which a Class is an instace of
-    Method method = class_isMetaClass(dest) ? class_getClassMethod(cls, sel) : class_getInstanceMethod(cls, sel);
+    Method method = class_isMetaClass(dest) ? class_getClassMethod(cls, destSel) :  class_getInstanceMethod(cls, destSel);
     if (method == NULL) {
         [NSException raise:@"Failed to retrieve method" format:@"Got null for the source class %@ with selector %@", sig, NSStringFromSelector(sel)];
         return NULL;
@@ -71,10 +77,6 @@ ZKIMP ZKSuperImplementation(id object, SEL sel) {
     if (cls == NULL) {
         [NSException raise:@"Invalid Argument" format:@"Could not obtain class for the passed object"];
         return NULL;
-    }
-
-    if (class_isMetaClass(cls)) {
-        cls = object;
     }
     
     cls = class_getSuperclass(cls);
@@ -119,7 +121,7 @@ static BOOL enumerateMethods(Class, Class);
 static BOOL enumerateMethods(Class destination, Class source) {
     unsigned int methodCount;
     Method *methodList = class_copyMethodList(source, &methodCount);
-    BOOL success = NO;
+    BOOL success = YES;
     
     for (int i = 0; i < methodCount; i++) {
         Method method = methodList[i];
@@ -142,9 +144,10 @@ static BOOL enumerateMethods(Class destination, Class source) {
             // We are re-adding the destination selector because it could be on a superclass and not on the class itself. This method could fail
             class_addMethod(destination, selector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
             
-            method_exchangeImplementations(class_getInstanceMethod(destination, selector), method);
+            SEL destSel = destinationSelectorForSelector(selector, destination);
+            success &= class_addMethod(source, destSel, method_getImplementation(method), method_getTypeEncoding(originalMethod));
             
-            success &= YES;
+            method_exchangeImplementations(class_getInstanceMethod(destination, selector), class_getInstanceMethod(source, destSel));
         } else {
             // Add any extra methods to the class but don't swizzle them
             success &= class_addMethod(destination, selector, method_getImplementation(method), method_getTypeEncoding(method));
