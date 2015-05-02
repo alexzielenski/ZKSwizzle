@@ -39,7 +39,7 @@ id bloxecute(id (^block)()) {
 @implementation ZKSwizzleClass
 
 + (BOOL)isSubclassOfClass:(Class)aClass {
-    return ZKOrig(BOOL);
+    return ZKOrig(BOOL, aClass);
 }
 
 - (NSString *)className {
@@ -83,6 +83,10 @@ id bloxecute(id (^block)()) {
 
 - (NSString *)selectorName {
     return [NSString stringWithFormat:@"BREH: %@", ZKOrig(NSString *)];
+}
+
+- (NSString *)description {
+    return [@"MULTIPLE: " stringByAppendingString: ZKOrig(NSString *)];
 }
 
 @end
