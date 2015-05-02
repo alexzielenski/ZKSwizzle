@@ -22,26 +22,29 @@ ZKSwizzle also provides macros for calling the original implementation if need b
 // All methods on this class which are present on the class that
 // it is swizzled to (including superclasses) are called instead of their
 // original implementation. The original implementaion can be accessed with the 
-// ZKOrig(...) macro and the implementation of the superclass of the class which
-// it was swizzled to can be access with the ZKSuper(...) macro
-@interface ReplacementObject : NSObject
+// ZKOrig(TYPE, ...) macro and the implementation of the superclass of the class which
+// it was swizzled to can be access with the ZKSuper(TYPE, ...) macro
+// ZKSwizzleInterface(MyClass, TargetClass, Superclass) defines a class for
+// you that will get swizzled automatically on launch with the TargetClass
+ZKSwizzleInterface(ReplacementObject, OriginalObject, NSObject)
+@implmentation ReplacementObject
 // Returns YES
-+ (BOOL)isSubclassOfClass:(Class)aClass { return (BOOL)ZKOrig(); }
++ (BOOL)isSubclassOfClass:(Class)aClass { return ZKOrig(BOOL); }
 
 // Returns "original_replaced"
-- (NSString *)className { return [ZKOrig() stringByAppendingString:@"_replaced"]; }
+- (NSString *)className { return [ZKOrig(NSString *) stringByAppendingString:@"_replaced"]; }
 
 // Returns "replaced" when called on the OriginalObject class
 + (NSString *)classMethod { return @"replaced"; }
 
 // Returns the default description implemented by NSObject
-+ (NSString *)description { return ZKSuper(); }
++ (NSString *)description { return ZKSuper(NSString *); }
 
 // Returns "replaced" when called on an instance of OriginalObject
 - (NSString *)instanceMethod { return @"replaced"; }
 	
 // Returns the default description implemented by NSObject
-- (NSString *)description { return ZKSuper(); }
+- (NSString *)description { return ZKSuper(NSString *); }
 	
 // This method is added to instances of OriginalObject and can be called
 // like any normal function on OriginalObject
@@ -52,7 +55,10 @@ ZKSwizzle also provides macros for calling the original implementation if need b
 	
 Call this somewhere to initialize the swizzling:
 ```objc
-// ZKSwizzle(SOURCE, DST) is a macro shorthand for calling +swizzleClass:forClass: on ZKSwizzle
+// ZKSwizzle(SOURCE, DST) is a macro shorthand for calling 
+// ZKSwizzleInterface handles this step for you, but you will
+// have to call it manually if you don't use ZKSwizzleInterface
++swizzleClass:forClass: on ZKSwizzle
 ZKSwizzle(ReplacementObject, OriginalObject);
 ```
 
@@ -69,7 +75,7 @@ int *myIvar = &ZKHookIvar(self, int, "_myIvar");
 
 # "Swizzling the right way"
 
-Some say that using `method_exchangeImplementations` causes problems with the original implementation being passed a replaced `_cmd` such as `old_description` which would be the new selector for the original implementation of a swizzled `description`. ZKSwizzle solves this problem with `ZKOrig(...)` which passes the correct selector to the original implementation and thus avoids this problem.
+Some say that using `method_exchangeImplementations` causes problems with the original implementation being passed a replaced `_cmd` such as `old_description` which would be the new selector for the original implementation of a swizzled `description`. ZKSwizzle solves this problem with `ZKOrig(TYPE, ...)` which passes the correct selector to the original implementation and thus avoids this problem.
 
 #License
 
