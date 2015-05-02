@@ -11,7 +11,6 @@
 #include <sys/cdefs.h>
 
 // This is a class for streamlining swizzling. Simply create a new class of any name you want and
-// this will swizzle any methods with a prefix defined in the +prefix method
 
 // Example:
 /*
@@ -33,6 +32,37 @@
  
  */
 
+// CRAZY MACROS FOR DYNAMIC PROTOTYPE CREATION
+#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL(0, ## __VA_ARGS__, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5 ,4 ,3 ,2, 1, 0)
+#define VA_NUM_ARGS_IMPL(_0, _1,_2,_3,_4,_5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20 ,N,...) N
+
+#define WRAP0()
+#define WRAP1(VARIABLE) , typeof ( VARIABLE )
+#define WRAP2(VARIABLE, ...) WRAP1(VARIABLE) WRAP1(__VA_ARGS__)
+#define WRAP3(VARIABLE, ...) WRAP1(VARIABLE) WRAP2(__VA_ARGS__)
+#define WRAP4(VARIABLE, ...) WRAP1(VARIABLE) WRAP3(__VA_ARGS__)
+#define WRAP5(VARIABLE, ...) WRAP1(VARIABLE) WRAP4(__VA_ARGS__)
+#define WRAP6(VARIABLE, ...) WRAP1(VARIABLE) WRAP5(__VA_ARGS__)
+#define WRAP7(VARIABLE, ...) WRAP1(VARIABLE) WRAP6(__VA_ARGS__)
+#define WRAP8(VARIABLE, ...) WRAP1(VARIABLE) WRAP7(__VA_ARGS__)
+#define WRAP9(VARIABLE, ...) WRAP1(VARIABLE) WRAP8(__VA_ARGS__)
+#define WRAP10(VARIABLE, ...) WRAP1(VARIABLE) WRAP9(__VA_ARGS__)
+#define WRAP11(VARIABLE, ...) WRAP1(VARIABLE) WRAP10(__VA_ARGS__)
+#define WRAP12(VARIABLE, ...) WRAP1(VARIABLE) WRAP11(__VA_ARGS__)
+#define WRAP13(VARIABLE, ...) WRAP1(VARIABLE) WRAP12(__VA_ARGS__)
+#define WRAP14(VARIABLE, ...) WRAP1(VARIABLE) WRAP13(__VA_ARGS__)
+#define WRAP15(VARIABLE, ...) WRAP1(VARIABLE) WRAP14(__VA_ARGS__)
+#define WRAP16(VARIABLE, ...) WRAP1(VARIABLE) WRAP15(__VA_ARGS__)
+#define WRAP17(VARIABLE, ...) WRAP1(VARIABLE) WRAP16(__VA_ARGS__)
+#define WRAP18(VARIABLE, ...) WRAP1(VARIABLE) WRAP17(__VA_ARGS__)
+#define WRAP19(VARIABLE, ...) WRAP1(VARIABLE) WRAP18(__VA_ARGS__)
+#define WRAP20(VARIABLE, ...) WRAP1(VARIABLE) WRAP19(__VA_ARGS__)
+
+#define CAT(A, B) A ## B
+#define INVOKE(MACRO, NUMBER, ...) CAT(MACRO, NUMBER)(__VA_ARGS__)
+#define WRAP_LIST(...) INVOKE(WRAP, VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+    
+
 // Gets the a class with the name CLASS
 #define ZKClass(CLASS) objc_getClass(#CLASS)
 
@@ -47,17 +77,10 @@
         _Pragma("clang diagnostic pop")
 #endif
 // returns the original implementation of the swizzled function or null or not found
-#if !__has_feature(objc_arc)
-    #define ZKOrig(...) (ZKOriginalImplementation(self, _cmd, __PRETTY_FUNCTION__))(self, _cmd, ##__VA_ARGS__)
-#else
-    #define ZKOrig(TYPE, ...) ((TYPE (*)(id, SEL, ...))(ZKOriginalImplementation(self, _cmd, __PRETTY_FUNCTION__)))(self, _cmd, ##__VA_ARGS__)
-#endif
+#define ZKOrig(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKOriginalImplementation(self, _cmd, __PRETTY_FUNCTION__)))(self, _cmd, ##__VA_ARGS__)
+
 // returns the original implementation of the superclass of the object swizzled
-#if !__has_feature(objc_arc)
-    #define ZKSuper(...) (ZKSuperImplementation(self, _cmd))(self, _cmd, ##__VA_ARGS__)
-#else
-    #define ZKSuper(TYPE, ...) ((TYPE (*)(id, SEL, ...))(ZKSuperImplementation(self, _cmd)))(self, _cmd, ##__VA_ARGS__)
-#endif
+#define ZKSuper(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKSuperImplementation(self, _cmd)))(self, _cmd, ##__VA_ARGS__)
 
 #define ZKSwizzle(SOURCE, DESTINATION) [ZKSwizzle swizzleClass:ZKClass(SOURCE) forClass:ZKClass(DESTINATION)]
 #define ZKSwizzleClass(SOURCE) [ZKSwizzle swizzleClass:ZKClass(SOURCE)]
