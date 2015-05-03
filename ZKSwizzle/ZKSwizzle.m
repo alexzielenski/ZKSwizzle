@@ -108,27 +108,21 @@ ZKIMP ZKSuperImplementation(id object, SEL sel) {
 }
 
 static BOOL enumerateMethods(Class, Class);
-
-@implementation ZKSwizzle
-
-+ (BOOL)swizzleClass:(Class)source {
-    return [self swizzleClass:source forClass:[source superclass]];
-}
-
-+ (BOOL)swizzleClass:(Class)source forClass:(Class)destination {
-    BOOL success = enumerateMethods(destination, source);
+BOOL _ZKSwizzle(Class src, Class dest) {
+    BOOL success = enumerateMethods(dest, src);
     // The above method only gets instance methods. Do the same method for the metaclass of the class
-    success     &= enumerateMethods(object_getClass(destination), object_getClass(source));
-    
+    success     &= enumerateMethods(object_getClass(dest), object_getClass(src));
     return success;
 }
-@end
+
+BOOL _ZKSwizzleClass(Class cls) {
+    return _ZKSwizzle(cls, [cls superclass]);
+}
 
 static BOOL enumerateMethods(Class destination, Class source) {
     unsigned int methodCount;
     Method *methodList = class_copyMethodList(source, &methodCount);
     BOOL success = YES;
-    
     for (int i = 0; i < methodCount; i++) {
         Method method = methodList[i];
         SEL selector  = method_getName(method);

@@ -35,11 +35,11 @@ id bloxecute(id (^block)()) {
 - (NSString *)selectorName { return NSStringFromSelector(_cmd); }
 @end
 
-@interface ZKSwizzleClass : ZKOriginalClass @end
-@implementation ZKSwizzleClass
+@interface ZKSwizzlerClass : ZKOriginalClass @end
+@implementation ZKSwizzlerClass
 
 + (BOOL)isSubclassOfClass:(Class)aClass {
-    return ZKOrig(BOOL, aClass);
+    return ZKSuper(BOOL, aClass);
 }
 
 - (NSString *)className {
@@ -76,10 +76,10 @@ id bloxecute(id (^block)()) {
 
 @end
 
-@interface ZKSwizzleClass2 : ZKOriginalClass
+@interface ZKSwizzlerClass2 : ZKOriginalClass
 
 @end
-@implementation ZKSwizzleClass2
+@implementation ZKSwizzlerClass2
 
 - (NSString *)selectorName {
     return [NSString stringWithFormat:@"BREH: %@", ZKOrig(NSString *)];
@@ -98,8 +98,9 @@ id bloxecute(id (^block)()) {
 
 - (void)setUp {
     [super setUp];
-    ZKSwizzleClass(ZKSwizzleClass);
-    ZKSwizzleClass(ZKSwizzleClass2);
+    NSLog(@"%@", NSStringFromClass(ZKClass(ZKSwizzlerClass)));
+    _ZKSwizzleClass(ZKClass(ZKSwizzlerClass));
+    _ZKSwizzleClass(ZKClass(ZKSwizzlerClass2));
 }
 
 - (void)testExample {
@@ -108,7 +109,7 @@ id bloxecute(id (^block)()) {
     XCTAssertEqualObjects([instance instanceMethod], @"replaced", @"replacing instance methods");
     XCTAssertNotEqualObjects([ ZKOriginalClass description], @"original", @"calling super on class");
     XCTAssertNotEqualObjects([instance description], @"original", @"calling super on instance");
-    XCTAssertEqual([ ZKOriginalClass isSubclassOfClass:[NSString class]], YES, @"calling super imp on class");
+    XCTAssertEqual([ ZKOriginalClass isSubclassOfClass:[NSString class]], NO, @"calling super imp on class");
     XCTAssertEqualObjects([instance className], @"ZKOriginalClass_replaced", @"calling original imp on instance");
     XCTAssertEqualObjects([instance selectorName], @"BREH: selectorName", @"_cmd correct on original imps");
     XCTAssertEqual([instance ivar], 3, @"hooking ivars");

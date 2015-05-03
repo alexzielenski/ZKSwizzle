@@ -82,9 +82,6 @@
 // returns the original implementation of the superclass of the object swizzled
 #define ZKSuper(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKSuperImplementation(self, _cmd)))(self, _cmd, ##__VA_ARGS__)
 
-#define ZKSwizzle(SOURCE, DESTINATION) [ZKSwizzle swizzleClass:ZKClass(SOURCE) forClass:ZKClass(DESTINATION)]
-#define ZKSwizzleClass(SOURCE) [ZKSwizzle swizzleClass:ZKClass(SOURCE)]
-
 // Ripped off from MobileSubstrate
 // Bootstraps your swizzling class so that it requires no setup
 // outside of this macro call
@@ -114,14 +111,14 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info);
 // returns the implementation of a method with selector "sel" of the superclass of object
 ZKIMP ZKSuperImplementation(id object, SEL sel);
 
-__END_DECLS
-
-@interface ZKSwizzle : NSObject
 // hooks all the implemented methods of source with destination
 // adds any methods that arent implemented on destination to destination that are implemented in source
-+ (BOOL)swizzleClass:(Class)source forClass:(Class)destination;
+#define ZKSwizzle(src, dst) _ZKSwizzle(ZKClass(src) ?: src, ZKClass(dst) ?: dst)
+BOOL _ZKSwizzle(Class src, Class dest);
 
 // Calls above method with the superclass of source for desination
-+ (BOOL)swizzleClass:(Class)source;
+#define ZKSwizzleClass(src) _ZKSwizzleClass(ZKClass(src) ?: src)
+BOOL _ZKSwizzleClass(Class cls);
 
-@end
+__END_DECLS
+
