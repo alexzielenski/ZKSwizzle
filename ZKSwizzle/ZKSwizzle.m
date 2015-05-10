@@ -67,10 +67,9 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
         return NULL;
     }
     
-    BOOL isClassMethod = class_isMetaClass(dest);
     SEL destSel = destinationSelectorForSelector(sel, cls);
     
-    Method method = isClassMethod ? class_getClassMethod(cls, destSel) :  class_getInstanceMethod(cls, destSel);
+    Method method =  class_getInstanceMethod(dest, destSel);
     
     if (method == NULL) {
         [NSException raise:@"Failed to retrieve method" format:@"Got null for the source class %@ with selector %@ (%@)", NSStringFromClass(cls), NSStringFromSelector(sel), NSStringFromSelector(destSel)];
