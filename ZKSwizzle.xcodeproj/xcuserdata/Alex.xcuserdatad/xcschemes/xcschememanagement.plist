@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>iOSTests.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
@@ -38,6 +43,16 @@
 			<true/>
 		</dict>
 		<key>FA35278B1980EB8300EF2D5B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FA700E0F1AFFD89F00C19257</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FA700E1F1AFFD8AC00C19257</key>
 		<dict>
 			<key>primary</key>
 			<true/>

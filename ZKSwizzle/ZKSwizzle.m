@@ -7,6 +7,8 @@
 //
 
 #import "ZKSwizzle.h"
+static NSMutableDictionary *classTable;
+
 void *ZKIvarPointer(id self, const char *name) {
     Ivar ivar = class_getInstanceVariable(object_getClass(self), name);
     return ivar == NULL ? NULL : (__bridge void *)self + ivar_getOffset(ivar);
@@ -16,9 +18,25 @@ static SEL destinationSelectorForSelector(SEL cmd, Class dst) {
     return NSSelectorFromString([@"_ZK_old_" stringByAppendingFormat:@"%s_%@", class_getName(dst), NSStringFromSelector(cmd)]);
 }
 
+static Class classFromInfo(const char *info) {
+    NSString *sig = @(info);
+    NSRange bracket = [sig rangeOfString:@"["];
+    if (bracket.location == NSNotFound || bracket.length != 1) {
+        [NSException raise:@"Failed to parse info" format:@"Couldn't find swizzle class for info: %s", info];
+        return NULL;
+    }
+    
+    sig = [sig substringFromIndex:bracket.location + bracket.length];
+    
+    NSRange brk = [sig rangeOfString:@" "];
+    sig = [sig substringToIndex:brk.location];
+    
+    return objc_getClass(sig.UTF8String);
+}
+
 // takes __PRETTY_FUNCTION__ for info which gives the name of the swizzle source class
 /*
-
+ 
  We add the original implementation onto the swizzle class
  On ZKOrig, we use __PRETTY_FUNCTION__ to get the name of the swizzle class
  Then we get the implementation of that selector on the swizzle class
@@ -30,38 +48,21 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
         [NSException raise:@"Invalid Arguments" format:@"One of self: %@, self: %@, or info: %s is NULL", self, NSStringFromSelector(sel), info];
         return NULL;
     }
-
-    NSString *sig = @(info);
-    NSRange bracket = [sig rangeOfString:@"["];
-    if (bracket.location == NSNotFound || bracket.length != 1) {
-        [NSException raise:@"Failed to parse info" format:@"Couldn't find swizzle class for info: %s", info];
-        return NULL;
-    }
     
-    NSString *typeString = [sig substringWithRange:NSMakeRange(bracket.location - 1, 1)];
-    BOOL isClassMethod = [typeString isEqualToString:@"+"];
-    if (!isClassMethod && ![typeString isEqualToString:@"-"]) {
-        [NSException raise:@"Failed to parse info" format:@"Could not identify type of method to call the original implementation of (class vs instance). Bailing..."];
-        return NULL;
-    }
-    
-    sig = [sig substringFromIndex:bracket.location + bracket.length];
-    
-    NSRange brk = [sig rangeOfString:@" "];
-    sig = [sig substringToIndex:brk.location];
-    
-    Class cls = objc_getClass(sig.UTF8String);
+    Class cls = classFromInfo(info);
     Class dest = object_getClass(self);
+    
     if (cls == NULL || dest == NULL) {
         [NSException raise:@"Failed obtain class pair" format:@"src: %@ | dst: %@ | sel: %@", NSStringFromClass(cls), NSStringFromClass(dest), NSStringFromSelector(sel)];
         return NULL;
     }
-
-    SEL destSel = destinationSelectorForSelector(sel, dest);
-
+    BOOL isClassMethod = class_isMetaClass(dest);
+    SEL destSel = destinationSelectorForSelector(sel, cls);
+    
     Method method = isClassMethod ? class_getClassMethod(cls, destSel) :  class_getInstanceMethod(cls, destSel);
+    
     if (method == NULL) {
-        [NSException raise:@"Failed to retrieve method" format:@"Got null for the source class %@ with selector %@", sig, NSStringFromSelector(sel)];
+        [NSException raise:@"Failed to retrieve method" format:@"Got null for the source class %@ with selector %@ (%@)", NSStringFromClass(cls), NSStringFromSelector(sel), NSStringFromSelector(destSel)];
         return NULL;
     }
     
@@ -73,7 +74,7 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
     return implementation;
 }
 
-ZKIMP ZKSuperImplementation(id object, SEL sel) {
+ZKIMP ZKSuperImplementation(id object, SEL sel, const char *info) {
     if (sel == NULL || object == NULL) {
         [NSException raise:@"Invalid Arguments" format:@"One of self: %@, self: %@ is NULL", object, NSStringFromSelector(sel)];
         return NULL;
@@ -85,8 +86,28 @@ ZKIMP ZKSuperImplementation(id object, SEL sel) {
         return NULL;
     }
     
-    cls = class_getSuperclass(cls);
+    // Two scenarios:
+    // 1.) The superclass was not swizzled, no problem
+    // 2.) The superclass was swizzled, problem
     
+    // We want to return the swizzled class's superclass implementation
+    // If this is a subclass of such a class, we want two behaviors:
+    // a.) If this imp was also swizzled, no problem, return the superclass's swizzled imp
+    // b.) This imp was not swizzled, return the class that was originally swizzled's superclass's imp
+    Class sourceClass = classFromInfo(info);
+    if (sourceClass != NULL) {
+        BOOL isClassMethod = class_isMetaClass(cls);
+        // This was called from a swizzled method, get the class it was swizzled with
+        cls = NSClassFromString(classTable[NSStringFromClass(sourceClass)]);
+        
+        // make sure we get a class method if we asked for one
+        if (isClassMethod) {
+            cls = object_getClass(cls);
+        }
+    }
+    
+    cls = class_getSuperclass(cls);
+
     // This is a root class, it has no super class
     if (cls == NULL) {
         [NSException raise:@"Invalid Argument" format:@"Could not obtain superclass for the passed object"];
@@ -109,9 +130,22 @@ ZKIMP ZKSuperImplementation(id object, SEL sel) {
 
 static BOOL enumerateMethods(Class, Class);
 BOOL _ZKSwizzle(Class src, Class dest) {
+    NSLog(@"ZKSwizzle: Swizzling %@ with %@", NSStringFromClass(src), NSStringFromClass(dest));
+    if (!classTable) {
+        classTable = [[NSMutableDictionary alloc] init];
+    }
+    
+    if ([classTable objectForKey:NSStringFromClass(src)]) {
+        [NSException raise:@"Invalid Argument"
+                    format:@"This source class was already swizzled with another"];
+        return NO;
+    }
+    
     BOOL success = enumerateMethods(dest, src);
     // The above method only gets instance methods. Do the same method for the metaclass of the class
     success     &= enumerateMethods(object_getClass(dest), object_getClass(src));
+    
+    [classTable setObject:NSStringFromClass(dest) forKey:NSStringFromClass(src)];
     return success;
 }
 
@@ -127,11 +161,11 @@ static BOOL enumerateMethods(Class destination, Class source) {
         Method method = methodList[i];
         SEL selector  = method_getName(method);
         NSString *methodName = NSStringFromSelector(selector);
-
+        
         // We only swizzle methods that are implemented
         if (class_respondsToSelector(destination, selector)) {
             Method originalMethod = class_getInstanceMethod(destination, selector);
-
+            
             const char *originalType = method_getTypeEncoding(originalMethod);
             const char *newType = method_getTypeEncoding(method);
             if (strcmp(originalType, newType) != 0) {
@@ -144,8 +178,12 @@ static BOOL enumerateMethods(Class destination, Class source) {
             // We are re-adding the destination selector because it could be on a superclass and not on the class itself. This method could fail
             class_addMethod(destination, selector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
             
-            SEL destSel = destinationSelectorForSelector(selector, destination);
-            success &= class_addMethod(source, destSel, method_getImplementation(method), method_getTypeEncoding(originalMethod));
+            SEL destSel = destinationSelectorForSelector(selector, source);
+            if (!class_addMethod(destination, destSel, method_getImplementation(method), method_getTypeEncoding(originalMethod))) {
+                NSLog(@"ZKSwizzle: failed to add method %@ onto class %@ with selector %@", NSStringFromSelector(selector), NSStringFromClass(source), NSStringFromSelector(destSel));
+                success = NO;
+                continue;
+            }
             
             method_exchangeImplementations(class_getInstanceMethod(destination, selector), class_getInstanceMethod(source, destSel));
         } else {

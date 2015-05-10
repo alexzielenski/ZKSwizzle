@@ -11,10 +11,19 @@
 		FA3527871980EB8300EF2D5B /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FA3527861980EB8300EF2D5B /* ZKSwizzle.m */; };
 		FA35278D1980EB8300EF2D5B /* libZKSwizzle.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3527811980EB8300EF2D5B /* libZKSwizzle.a */; };
 		FA35279C1980EC8C00EF2D5B /* ZKTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FA35279B1980EC8C00EF2D5B /* ZKTests.m */; };
+		FA700E251AFFD8AC00C19257 /* iOSTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FA700E241AFFD8AC00C19257 /* iOSTests.m */; };
+		FA700E2C1AFFD91600C19257 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FA3527861980EB8300EF2D5B /* ZKSwizzle.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		FA35278E1980EB8300EF2D5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA3527791980EB8300EF2D5B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA3527801980EB8300EF2D5B;
+			remoteInfo = ZKSwizzle;
+		};
+		FA700E271AFFD8AC00C19257 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FA3527791980EB8300EF2D5B /* Project object */;
 			proxyType = 1;
@@ -30,6 +39,9 @@
 		FA35278C1980EB8300EF2D5B /* ZKSwizzleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZKSwizzleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA3527921980EB8300EF2D5B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA35279B1980EC8C00EF2D5B /* ZKTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZKTests.m; sourceTree = "<group>"; };
+		FA700E201AFFD8AC00C19257 /* iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA700E231AFFD8AC00C19257 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FA700E241AFFD8AC00C19257 /* iOSTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOSTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +60,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FA700E1D1AFFD8AC00C19257 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -56,6 +75,7 @@
 			children = (
 				FA3527831980EB8300EF2D5B /* ZKSwizzle */,
 				FA3527901980EB8300EF2D5B /* ZKSwizzleTests */,
+				FA700E211AFFD8AC00C19257 /* iOSTests */,
 				FA3527821980EB8300EF2D5B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +85,7 @@
 			children = (
 				FA3527811980EB8300EF2D5B /* libZKSwizzle.a */,
 				FA35278C1980EB8300EF2D5B /* ZKSwizzleTests.xctest */,
+				FA700E201AFFD8AC00C19257 /* iOSTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -91,6 +112,23 @@
 			isa = PBXGroup;
 			children = (
 				FA3527921980EB8300EF2D5B /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FA700E211AFFD8AC00C19257 /* iOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				FA700E241AFFD8AC00C19257 /* iOSTests.m */,
+				FA700E221AFFD8AC00C19257 /* Supporting Files */,
+			);
+			path = iOSTests;
+			sourceTree = "<group>";
+		};
+		FA700E221AFFD8AC00C19257 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FA700E231AFFD8AC00C19257 /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -144,6 +182,24 @@
 			productReference = FA35278C1980EB8300EF2D5B /* ZKSwizzleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		FA700E1F1AFFD8AC00C19257 /* iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA700E291AFFD8AC00C19257 /* Build configuration list for PBXNativeTarget "iOSTests" */;
+			buildPhases = (
+				FA700E1C1AFFD8AC00C19257 /* Sources */,
+				FA700E1D1AFFD8AC00C19257 /* Frameworks */,
+				FA700E1E1AFFD8AC00C19257 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA700E281AFFD8AC00C19257 /* PBXTargetDependency */,
+			);
+			name = iOSTests;
+			productName = iOSTests;
+			productReference = FA700E201AFFD8AC00C19257 /* iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -159,6 +215,9 @@
 					FA35278B1980EB8300EF2D5B = {
 						CreatedOnToolsVersion = 6.0;
 						TestTargetID = FA3527801980EB8300EF2D5B;
+					};
+					FA700E1F1AFFD8AC00C19257 = {
+						CreatedOnToolsVersion = 6.3;
 					};
 				};
 			};
@@ -176,12 +235,20 @@
 			targets = (
 				FA3527801980EB8300EF2D5B /* ZKSwizzle */,
 				FA35278B1980EB8300EF2D5B /* ZKSwizzleTests */,
+				FA700E1F1AFFD8AC00C19257 /* iOSTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		FA35278A1980EB8300EF2D5B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA700E1E1AFFD8AC00C19257 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -207,6 +274,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FA700E1C1AFFD8AC00C19257 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA700E251AFFD8AC00C19257 /* iOSTests.m in Sources */,
+				FA700E2C1AFFD91600C19257 /* ZKSwizzle.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -214,6 +290,11 @@
 			isa = PBXTargetDependency;
 			target = FA3527801980EB8300EF2D5B /* ZKSwizzle */;
 			targetProxy = FA35278E1980EB8300EF2D5B /* PBXContainerItemProxy */;
+		};
+		FA700E281AFFD8AC00C19257 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA3527801980EB8300EF2D5B /* ZKSwizzle */;
+			targetProxy = FA700E271AFFD8AC00C19257 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -340,6 +421,47 @@
 			};
 			name = Release;
 		};
+		FA700E2A1AFFD8AC00C19257 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Business Systems, Inc.";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = iOSTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		FA700E2B1AFFD8AC00C19257 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Business Systems, Inc.";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = iOSTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -359,12 +481,22 @@
 				FA3527971980EB8300EF2D5B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FA3527981980EB8300EF2D5B /* Build configuration list for PBXNativeTarget "ZKSwizzleTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FA3527991980EB8300EF2D5B /* Debug */,
 				FA35279A1980EB8300EF2D5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA700E291AFFD8AC00C19257 /* Build configuration list for PBXNativeTarget "iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA700E2A1AFFD8AC00C19257 /* Debug */,
+				FA700E2B1AFFD8AC00C19257 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};

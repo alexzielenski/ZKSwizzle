@@ -61,26 +61,26 @@
 #define CAT(A, B) A ## B
 #define INVOKE(MACRO, NUMBER, ...) CAT(MACRO, NUMBER)(__VA_ARGS__)
 #define WRAP_LIST(...) INVOKE(WRAP, VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
-    
+
 
 // Gets the a class with the name CLASS
 #define ZKClass(CLASS) objc_getClass(#CLASS)
 
 // returns the value of an instance variable.
 #if !__has_feature(objc_arc)
-    #define ZKHookIvar(OBJECT, TYPE, NAME) (*(TYPE *)ZKIvarPointer(OBJECT, NAME))
+#define ZKHookIvar(OBJECT, TYPE, NAME) (*(TYPE *)ZKIvarPointer(OBJECT, NAME))
 #else
-    #define ZKHookIvar(OBJECT, TYPE, NAME) \
-        _Pragma("clang diagnostic push") \
-        _Pragma("clang diagnostic ignored \"-Wignored-attributes\"") \
-            (*(__unsafe_unretained TYPE *)ZKIvarPointer(OBJECT, NAME)) \
-        _Pragma("clang diagnostic pop")
+#define ZKHookIvar(OBJECT, TYPE, NAME) \
+_Pragma("clang diagnostic push") \
+_Pragma("clang diagnostic ignored \"-Wignored-attributes\"") \
+(*(__unsafe_unretained TYPE *)ZKIvarPointer(OBJECT, NAME)) \
+_Pragma("clang diagnostic pop")
 #endif
 // returns the original implementation of the swizzled function or null or not found
 #define ZKOrig(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKOriginalImplementation(self, _cmd, __PRETTY_FUNCTION__)))(self, _cmd, ##__VA_ARGS__)
 
 // returns the original implementation of the superclass of the object swizzled
-#define ZKSuper(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKSuperImplementation(self, _cmd)))(self, _cmd, ##__VA_ARGS__)
+#define ZKSuper(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKSuperImplementation(self, _cmd, __PRETTY_FUNCTION__)))(self, _cmd, ##__VA_ARGS__)
 
 // Ripped off from MobileSubstrate
 // Bootstraps your swizzling class so that it requires no setup
@@ -88,16 +88,16 @@
 // If you override +load you must call ZKSwizzle(CLASS_NAME, TARGET_CLASS)
 // yourself, otherwise the swizzling would not take place
 #define ZKSwizzleInterface(CLASS_NAME, TARGET_CLASS, SUPERCLASS) \
-    @interface _$ ## CLASS_NAME : SUPERCLASS @end \
-    @implementation _$ ## CLASS_NAME \
-        + (void)initialize {} \
-    @end \
-    @interface CLASS_NAME : _$ ## CLASS_NAME @end \
-    @implementation CLASS_NAME (ZKSWIZZLE) \
-        + (void)load { \
-            ZKSwizzle(CLASS_NAME, TARGET_CLASS); \
-        } \
-    @end
+@interface _$ ## CLASS_NAME : SUPERCLASS @end \
+@implementation _$ ## CLASS_NAME \
++ (void)initialize {} \
+@end \
+@interface CLASS_NAME : _$ ## CLASS_NAME @end \
+@implementation CLASS_NAME (ZKSWIZZLE) \
++ (void)load { \
+ZKSwizzle(CLASS_NAME, TARGET_CLASS); \
+} \
+@end
 
 // thanks OBJC_OLD_DISPATCH_PROTOTYPES=0
 typedef id (*ZKIMP)(id, SEL, ...);
@@ -109,15 +109,15 @@ void *ZKIvarPointer(id self, const char *name);
 // returns the original implementation of a method with selector "sel" of an object hooked by the methods below
 ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info);
 // returns the implementation of a method with selector "sel" of the superclass of object
-ZKIMP ZKSuperImplementation(id object, SEL sel);
+ZKIMP ZKSuperImplementation(id object, SEL sel, const char *info);
 
 // hooks all the implemented methods of source with destination
 // adds any methods that arent implemented on destination to destination that are implemented in source
-#define ZKSwizzle(src, dst) _ZKSwizzle(ZKClass(src) ?: src, ZKClass(dst) ?: dst)
+#define ZKSwizzle(src, dst) _ZKSwizzle(ZKClass(src), ZKClass(dst))
 BOOL _ZKSwizzle(Class src, Class dest);
 
 // Calls above method with the superclass of source for desination
-#define ZKSwizzleClass(src) _ZKSwizzleClass(ZKClass(src) ?: src)
+#define ZKSwizzleClass(src) _ZKSwizzleClass(ZKClass(src))
 BOOL _ZKSwizzleClass(Class cls);
 
 __END_DECLS
