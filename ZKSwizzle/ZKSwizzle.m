@@ -206,7 +206,7 @@ static BOOL enumerateMethods(Class destination, Class source) {
                 continue;
             }
             
-            method_exchangeImplementations(class_getInstanceMethod(destination, selector), class_getInstanceMethod(source, destSel));
+            method_exchangeImplementations(class_getInstanceMethod(destination, selector), class_getInstanceMethod(destination, destSel));
         } else {
             // Add any extra methods to the class but don't swizzle them
             success &= class_addMethod(destination, selector, method_getImplementation(method), method_getTypeEncoding(method));
