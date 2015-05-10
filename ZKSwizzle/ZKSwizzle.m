@@ -19,19 +19,29 @@ static SEL destinationSelectorForSelector(SEL cmd, Class dst) {
 }
 
 static Class classFromInfo(const char *info) {
-    NSString *sig = @(info);
-    NSRange bracket = [sig rangeOfString:@"["];
-    if (bracket.location == NSNotFound || bracket.length != 1) {
+    NSUInteger bracket_index = -1;
+    for (NSUInteger i = 0; i < strlen(info); i++) {
+        if (info[i] == '[') {
+            bracket_index = i;
+        }
+    }
+    bracket_index++;
+    
+    if (bracket_index == -1) {
         [NSException raise:@"Failed to parse info" format:@"Couldn't find swizzle class for info: %s", info];
         return NULL;
     }
     
-    sig = [sig substringFromIndex:bracket.location + bracket.length];
+    char after_bracket[255];
+    memcpy(after_bracket, &info[bracket_index], strlen(info) - bracket_index - 1);
     
-    NSRange brk = [sig rangeOfString:@" "];
-    sig = [sig substringToIndex:brk.location];
-    
-    return objc_getClass(sig.UTF8String);
+    for (NSUInteger i = 0; i < strlen(info); i++) {
+        if (after_bracket[i] == ' ') {
+            after_bracket[i] = '\0';
+        }
+    }
+
+    return objc_getClass(after_bracket);
 }
 
 // takes __PRETTY_FUNCTION__ for info which gives the name of the swizzle source class
@@ -56,6 +66,7 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
         [NSException raise:@"Failed obtain class pair" format:@"src: %@ | dst: %@ | sel: %@", NSStringFromClass(cls), NSStringFromClass(dest), NSStringFromSelector(sel)];
         return NULL;
     }
+    
     BOOL isClassMethod = class_isMetaClass(dest);
     SEL destSel = destinationSelectorForSelector(sel, cls);
     
