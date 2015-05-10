@@ -100,6 +100,28 @@ id bloxecute(id (^block)()) {
 
 @end
 
+@interface DummyClass : NSObject
+@end
+
+@implementation DummyClass
+
+- (NSString *)description {
+    return @"DummyClass";
+}
+
+@end
+
+@interface NewClass : DummyClass
+@end
+
+@implementation NewClass
+
+- (NSString *)description {
+    return ZKSuper(NSString *);
+}
+
+@end
+
 @interface ZKTests : XCTestCase
 @end
 
@@ -122,6 +144,7 @@ id bloxecute(id (^block)()) {
     XCTAssertEqualObjects([instance selectorName], @"BREH: selectorName", @"_cmd correct on original imps");
     XCTAssertEqual([instance ivar], 3, @"hooking ivars");
     XCTAssertEqual([instance addedMethod], @"hi", @"adding methods");
+    XCTAssertEqualObjects([[[NewClass alloc] init] description], @"DummyClass", @"ZKSuper outside of swizzling");
 }
 
 @end

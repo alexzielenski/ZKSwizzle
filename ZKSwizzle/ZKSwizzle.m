@@ -98,11 +98,13 @@ ZKIMP ZKSuperImplementation(id object, SEL sel, const char *info) {
     if (sourceClass != NULL) {
         BOOL isClassMethod = class_isMetaClass(cls);
         // This was called from a swizzled method, get the class it was swizzled with
-        cls = NSClassFromString(classTable[NSStringFromClass(sourceClass)]);
-        
-        // make sure we get a class method if we asked for one
-        if (isClassMethod) {
-            cls = object_getClass(cls);
+        NSString *className = classTable[NSStringFromClass(sourceClass)];
+        if (className != NULL) {
+            cls = NSClassFromString(className);
+            // make sure we get a class method if we asked for one
+            if (isClassMethod) {
+                cls = object_getClass(cls);
+            }
         }
     }
     
