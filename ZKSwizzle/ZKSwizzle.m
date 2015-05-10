@@ -132,6 +132,14 @@ ZKIMP ZKSuperImplementation(id object, SEL sel, const char *info) {
 
 static BOOL enumerateMethods(Class, Class);
 BOOL _ZKSwizzle(Class src, Class dest) {
+    if (dest == NULL)
+        return NO;
+    
+    NSString *destName = NSStringFromClass(dest);
+    if (!destName) {
+        return NO;
+    }
+    
     NSLog(@"ZKSwizzle: Swizzling %@ with %@", NSStringFromClass(src), NSStringFromClass(dest));
     if (!classTable) {
         classTable = [[NSMutableDictionary alloc] init];
@@ -147,7 +155,7 @@ BOOL _ZKSwizzle(Class src, Class dest) {
     // The above method only gets instance methods. Do the same method for the metaclass of the class
     success     &= enumerateMethods(object_getClass(dest), object_getClass(src));
     
-    [classTable setObject:NSStringFromClass(dest) forKey:NSStringFromClass(src)];
+    [classTable setObject:destName forKey:NSStringFromClass(src)];
     return success;
 }
 
