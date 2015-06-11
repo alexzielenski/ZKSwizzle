@@ -150,7 +150,6 @@ BOOL _ZKSwizzle(Class src, Class dest) {
         return NO;
     }
     
-    NSLog(@"ZKSwizzle: Swizzling %@ with %@", NSStringFromClass(src), NSStringFromClass(dest));
     if (!classTable) {
         classTable = [[NSMutableDictionary alloc] init];
     }
