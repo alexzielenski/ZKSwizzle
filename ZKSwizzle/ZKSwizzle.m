@@ -9,6 +9,10 @@
 #import "ZKSwizzle.h"
 static NSMutableDictionary *classTable;
 
+@interface NSObject (ZKSwizzle)
++ (void)_ZK_unconditionallySwizzle;
+@end
+
 void *ZKIvarPointer(id self, const char *name) {
     Ivar ivar = class_getInstanceVariable(object_getClass(self), name);
     return ivar == NULL ? NULL : (__bridge void *)self + ivar_getOffset(ivar);
@@ -156,7 +160,7 @@ BOOL _ZKSwizzle(Class src, Class dest) {
     
     if ([classTable objectForKey:NSStringFromClass(src)]) {
         [NSException raise:@"Invalid Argument"
-                    format:@"This source class was already swizzled with another"];
+                    format:@"This source class (%@) was already swizzled with another, (%@)", NSStringFromClass(src), classTable[NSStringFromClass(src)]];
         return NO;
     }
     
@@ -173,6 +177,12 @@ BOOL _ZKSwizzleClass(Class cls) {
 }
 
 static BOOL enumerateMethods(Class destination, Class source) {
+#if OBJC_API_VERSION < 2
+    [NSException raise:@"Unsupported feature" format:@"ZKSwizzle is only available in objc 2.0"];
+    return NO;
+    
+#else
+    
     unsigned int methodCount;
     Method *methodList = class_copyMethodList(source, &methodCount);
     BOOL success = YES;
@@ -180,6 +190,11 @@ static BOOL enumerateMethods(Class destination, Class source) {
         Method method = methodList[i];
         SEL selector  = method_getName(method);
         NSString *methodName = NSStringFromSelector(selector);
+        
+        // Don't do anything with the unconditional swizzle
+        if (sel_isEqual(selector, @selector(_ZK_unconditionallySwizzle))) {
+            continue;
+        }
         
         // We only swizzle methods that are implemented
         if (class_respondsToSelector(destination, selector)) {
@@ -230,5 +245,47 @@ static BOOL enumerateMethods(Class destination, Class source) {
     
     free(propertyList);
     free(methodList);
+    return success;
+#endif
+}
+
+// Options were to use a group class and traverse its subclasses
+// or to create a groups dictionary
+// This works because +load on NSObject is called before attribute((constructor))
+static NSMutableDictionary *groups = nil;
+void _$ZKRegisterInterface(Class cls, const char *groupName) {
+    if (!groups)
+        groups = [NSMutableDictionary dictionary];
+    
+    NSString *groupString = @(groupName);
+    NSMutableArray *groupList = groups[groupString];
+    if (!groupList) {
+        groupList = [NSMutableArray array];
+        groups[groupString] = groupList;
+    }
+    
+    [groupList addObject:NSStringFromClass(cls)];
+}
+
+BOOL _ZKSwizzleGroup(const char *groupName) {
+    NSArray *groupList = groups[@(groupName)];
+    if (!groupList) {
+        [NSException raise:@"Invalid Argument" format:@"ZKSwizzle: There is no group by the name of %s", groupName];
+        return NO;
+    }
+    
+    BOOL success = YES;
+    for (NSString *className in groupList) {
+        Class cls = NSClassFromString(className);
+        if (cls == NULL)
+            continue;
+        
+        if (class_respondsToSelector(object_getClass(cls), @selector(_ZK_unconditionallySwizzle))) {
+            [cls _ZK_unconditionallySwizzle];
+        } else {
+            success = NO;
+        }
+    }
+    
     return success;
 }

@@ -122,6 +122,52 @@ id bloxecute(id (^block)()) {
 
 @end
 
+@interface GroupClass : NSObject
++ (NSString *)classMethod;
+- (NSString *)instanceMethod;
+@end
+
+@implementation GroupClass
+
++ (NSString *)classMethod {
+    return @"classMethod";
+}
+
+- (NSString *)instanceMethod {
+    return @"instanceMethod";
+}
+
+@end
+
+// Swizzled Group
+ZKSwizzleInterfaceGroup(GroupSwizzle, GroupClass, NSObject, Yosemite)
+@implementation GroupSwizzle
+
++ (NSString *)classMethod {
+    return @"swizzled";
+}
+
+- (NSString *)instanceMethod {
+    return @"swizzled";
+}
+
+@end
+
+// Unswizzled Group – unused
+ZKSwizzleInterfaceGroup(GroupSwizzle2, GroupClass, NSObject, Mavericks)
+@implementation GroupSwizzle2
+
++ (NSString *)classMethod {
+    return @"swizzled2";
+}
+
+- (NSString *)instanceMethod {
+    return @"swizzled2";
+}
+
+@end
+
+
 @interface ZKTests : XCTestCase
 @end
 
@@ -129,11 +175,11 @@ id bloxecute(id (^block)()) {
 
 - (void)setUp {
     [super setUp];
-    _ZKSwizzleClass(ZKClass(ZKSwizzlerClass));
-    _ZKSwizzleClass(ZKClass(ZKSwizzlerClass2));
 }
 
 - (void)testExample {
+    _ZKSwizzleClass(ZKClass(ZKSwizzlerClass));
+    _ZKSwizzleClass(ZKClass(ZKSwizzlerClass2));
     ZKOriginalClass *instance = [[ ZKOriginalClass alloc] init];
     XCTAssertEqualObjects([ ZKOriginalClass classMethod], @"replaced", @"replacing class methods");
     XCTAssertEqualObjects([instance instanceMethod], @"replaced", @"replacing instance methods");
@@ -145,6 +191,12 @@ id bloxecute(id (^block)()) {
     XCTAssertEqual([instance ivar], 3, @"hooking ivars");
     XCTAssertEqual([instance addedMethod], @"hi", @"adding methods");
     XCTAssertEqualObjects([[[NewClass alloc] init] description], @"DummyClass", @"ZKSuper outside of swizzling");
+}
+
+- (void)testGroups {
+    ZKSwizzleGroup(Yosemite);
+    XCTAssertEqualObjects([[[GroupClass alloc] init] instanceMethod], @"swizzled");
+    XCTAssertEqualObjects([GroupClass classMethod], @"swizzled");
 }
 
 @end
