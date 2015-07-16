@@ -255,7 +255,7 @@ static BOOL enumerateMethods(Class destination, Class source) {
 static NSMutableDictionary *groups = nil;
 void _$ZKRegisterInterface(Class cls, const char *groupName) {
     if (!groups)
-        groups = [NSMutableDictionary dictionary];
+        groups = [[NSMutableDictionary dictionary] retain];
     
     NSString *groupString = @(groupName);
     NSMutableArray *groupList = groups[groupString];
