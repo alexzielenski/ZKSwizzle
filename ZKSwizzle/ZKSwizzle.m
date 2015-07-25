@@ -27,6 +27,7 @@ static Class classFromInfo(const char *info) {
     for (NSUInteger i = 0; i < strlen(info); i++) {
         if (info[i] == '[') {
             bracket_index = i;
+            break;
         }
     }
     bracket_index++;
