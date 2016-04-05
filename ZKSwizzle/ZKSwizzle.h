@@ -134,6 +134,7 @@
 #define __HOOK(ARGC, ARGS...) hook_ ## ARGC (ARGS)
 #define _HOOK(ARGC, ARGS...) __HOOK(ARGC, ARGS)
 #define hook(...) _HOOK(VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+#define ctor __attribute__((constructor)) void init()
 
 __BEGIN_DECLS
 
