@@ -69,12 +69,12 @@ id bloxecute(id (^block)()) {
 - (int)ivar {
     int *hooked = &ZKHookIvar(self, int, "ivar");
     *hooked = 3;
-    return ZKOrig(int);
+    return _orig(int);
 }
 
 - (NSString *)selectorName {
     return bloxecute(^{
-        return ZKOrig(NSString *);
+        return _orig(NSString *);
     });
 }
 
@@ -140,8 +140,7 @@ id bloxecute(id (^block)()) {
 @end
 
 // Swizzled Group
-ZKSwizzleInterfaceGroup(GroupSwizzle, GroupClass, NSObject, Yosemite)
-@implementation GroupSwizzle
+hook(GroupClass, Yosemite)
 
 + (NSString *)classMethod {
     return @"swizzled";
@@ -151,11 +150,10 @@ ZKSwizzleInterfaceGroup(GroupSwizzle, GroupClass, NSObject, Yosemite)
     return @"swizzled";
 }
 
-@end
+endhook
 
 // Unswizzled Group – unused
-ZKSwizzleInterfaceGroup(GroupSwizzle2, GroupClass, NSObject, Mavericks)
-@implementation GroupSwizzle2
+hook(GroupClass, Mavericks)
 
 + (NSString *)classMethod {
     return @"swizzled2";
@@ -165,8 +163,13 @@ ZKSwizzleInterfaceGroup(GroupSwizzle2, GroupClass, NSObject, Mavericks)
     return @"swizzled2";
 }
 
-@end
+endhook
 
+#define ctor __attribute__((constructor)) void init()
+
+ctor {
+    ZKSwizzleGroup(Yosemite);
+}
 
 @interface ZKTests : XCTestCase
 @end
@@ -194,7 +197,6 @@ ZKSwizzleInterfaceGroup(GroupSwizzle2, GroupClass, NSObject, Mavericks)
 }
 
 - (void)testGroups {
-    ZKSwizzleGroup(Yosemite);
     XCTAssertEqualObjects([[[GroupClass alloc] init] instanceMethod], @"swizzled");
     XCTAssertEqualObjects([GroupClass classMethod], @"swizzled");
 }

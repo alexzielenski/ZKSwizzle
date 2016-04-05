@@ -71,6 +71,10 @@
     (*(__unsafe_unretained TYPE *)ZKIvarPointer(OBJECT, NAME)) \
     _Pragma("clang diagnostic pop")
 #endif
+
+////////////////////////////////////////////////////////////////////////////////
+//// Core Macros (For fine-tuned Use)
+////////////////////////////////////////////////////////////////////////////////
 // returns the original implementation of the swizzled function or null or not found
 #define ZKOrig(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKOriginalImplementation(self, _cmd, __PRETTY_FUNCTION__)))(self, _cmd, ##__VA_ARGS__)
 
@@ -78,21 +82,22 @@
 #define ZKSuper(TYPE, ...) ((TYPE (*)(id, SEL WRAP_LIST(__VA_ARGS__)))(ZKSuperImplementation(self, _cmd, __PRETTY_FUNCTION__)))(self, _cmd, ##__VA_ARGS__)
 
 #define _ZKSwizzleInterfaceConditionally(CLASS_NAME, TARGET_CLASS, SUPERCLASS, GROUP, IMMEDIATELY) \
-    @interface _$ ## CLASS_NAME : SUPERCLASS @end \
-    @implementation _$ ## CLASS_NAME \
-    + (void)initialize {} \
-    @end \
-    @interface CLASS_NAME : _$ ## CLASS_NAME @end \
-    @implementation CLASS_NAME (ZKSWIZZLE) \
-    + (void)load { \
-        _$ZKRegisterInterface(self, #GROUP);\
-        if (IMMEDIATELY) { \
-            [self _ZK_unconditionallySwizzle]; \
-        } \
-    } \
-    + (void)_ZK_unconditionallySwizzle { \
-        ZKSwizzle(CLASS_NAME, TARGET_CLASS); \
-    } \
+    @interface _$ ## CLASS_NAME : SUPERCLASS @end\
+    @implementation _$ ## CLASS_NAME\
+    + (void)initialize {}\
+    @end\
+    @interface CLASS_NAME : _$ ## CLASS_NAME @end\
+    @implementation CLASS_NAME (ZKSWIZZLE)\
+    + (void)load {\
+        if (IMMEDIATELY) {\
+            [self _ZK_unconditionallySwizzle];\
+        } else {\
+            _$ZKRegisterInterface(self, #GROUP);\
+        }\
+    }\
+    + (void)_ZK_unconditionallySwizzle {\
+        ZKSwizzle(CLASS_NAME, TARGET_CLASS);\
+    }\
 @end
 
 // Bootstraps your swizzling class so that it requires no setup
@@ -106,7 +111,35 @@
 #define ZKSwizzleInterfaceGroup(CLASS_NAME, TARGET_CLASS, SUPER_CLASS, GROUP) \
     _ZKSwizzleInterfaceConditionally(CLASS_NAME, TARGET_CLASS, SUPER_CLASS, GROUP, NO)
 
+////////////////////////////////////////////////////////////////////////////////
+//// Sugar Macros (For general use)
+////////////////////////////////////////////////////////////////////////////////
+// Inspired by logos. Credits to @mstg!
+
+#define __GEN_CLASS(TARGET, LINE) __ZK_## LINE## TARGET
+#define _GEN_CLASS(TARGET, LINE) __GEN_CLASS(TARGET, LINE)
+#define GEN_CLASS(TARGET) _GEN_CLASS(TARGET, __LINE__)
+
+#define hook_2(TARGET, GROUP) \
+    ZKSwizzleInterfaceGroup(GEN_CLASS(TARGET), TARGET, NSObject, GROUP) @implementation GEN_CLASS(TARGET)
+
+#define hook_1(TARGET) \
+    ZKSwizzleInterface(GEN_CLASS(TARGET), TARGET, NSObject) @implementation GEN_CLASS(TARGET)
+
+#define endhook @end
+
+#define _orig(...) ZKOrig(__VA_ARGS__)
+#define _super(...) ZKSuper(__VA_ARGS__)
+
+#define __HOOK(ARGC, ARGS...) hook_ ## ARGC (ARGS)
+#define _HOOK(ARGC, ARGS...) __HOOK(ARGC, ARGS)
+#define hook(...) _HOOK(VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+
 __BEGIN_DECLS
+
+////////////////////////////////////////////////////////////////////////////////
+//// C Backing (Don't typically call directly)
+////////////////////////////////////////////////////////////////////////////////
 
 // Make sure to cast this before you use it
 typedef id (*ZKIMP)(id, SEL, ...);
