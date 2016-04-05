@@ -22,29 +22,29 @@ ZKSwizzle also provides macros for calling the original implementation if need b
 // All methods on this class which are present on the class that
 // it is swizzled to (including superclasses) are called instead of their
 // original implementation. The original implementaion can be accessed with the 
-// ZKOrig(TYPE, ...) macro and the implementation of the superclass of the class which
-// it was swizzled to can be access with the ZKSuper(TYPE, ...) macro
-// ZKSwizzleInterface(MyClass, TargetClass, Superclass) defines a class for
+// _orig(TYPE, ...) macro and the implementation of the superclass of the class which
+// it was swizzled to can be access with the _super(TYPE, ...) macro
+// hook(TargetClass) defines a class for
 // you that will get swizzled automatically on launch with the TargetClass
 ZKSwizzleInterface(ReplacementObject, OriginalObject, NSObject)
 @implmentation ReplacementObject
 // Returns YES
-+ (BOOL)isSubclassOfClass:(Class)aClass { return ZKOrig(BOOL); }
++ (BOOL)isSubclassOfClass:(Class)aClass { return _orig(BOOL); }
 
 // Returns "original_replaced"
-- (NSString *)className { return [ZKOrig(NSString *) stringByAppendingString:@"_replaced"]; }
+- (NSString *)className { return [_orig(NSString *) stringByAppendingString:@"_replaced"]; }
 
 // Returns "replaced" when called on the OriginalObject class
 + (NSString *)classMethod { return @"replaced"; }
 
 // Returns the default description implemented by NSObject
-+ (NSString *)description { return ZKSuper(NSString *); }
++ (NSString *)description { return _super(NSString *); }
 
 // Returns "replaced" when called on an instance of OriginalObject
 - (NSString *)instanceMethod { return @"replaced"; }
 	
 // Returns the default description implemented by NSObject
-- (NSString *)description { return ZKSuper(NSString *); }
+- (NSString *)description { return _super(NSString *); }
 	
 // This method is added to instances of OriginalObject and can be called
 // like any normal function on OriginalObject
