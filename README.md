@@ -72,6 +72,34 @@ int *myIvar = &ZKHookIvar(self, int, "_myIvar");
 *myIvar = 3;
 ```
 
+You can also have grouped hooks, which means you can swizzle a specific class differently depending on something specific:
+```objc
+@interface GroupClass : NSObject
++ (NSString *)classMethod;
+- (NSString *)instanceMethod;
+@end
+
+@implementation GroupClass
++ (NSString *)classMethod { return @"classMethod"; }
+- (NSString *)instanceMethod { return @"instanceMethod"; }
+@end
+
+hook(GroupClass, Yosemite)
++ (NSString *)classMethod { return @"swizzled"; }
+- (NSString *)instanceMethod { return @"swizzled"; }
+endhook
+
+hook(GroupClass, Mavericks)
++ (NSString *)classMethod { return @"swizzled2"; }
+- (NSString *)instanceMethod { return @"swizzled2"; }
+endhook
+
+ctor {
+    int ver = 1;
+    ver == 1 ? ZKSwizzleGroup(Yosemite) : ZKSwizzleGroup(Mavericks);
+}
+```
+
 # "Swizzling the right way"
 
 Some say that using `method_exchangeImplementations` causes problems with the original implementation being passed a replaced `_cmd` such as `old_description` which would be the new selector for the original implementation of a swizzled `description`. ZKSwizzle solves this problem with `ZKOrig(TYPE, ...)` which passes the correct selector to the original implementation and thus avoids this problem.
