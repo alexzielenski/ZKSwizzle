@@ -26,8 +26,7 @@ ZKSwizzle also provides macros for calling the original implementation if need b
 // it was swizzled to can be access with the _super(TYPE, ...) macro
 // hook(TargetClass) defines a class for
 // you that will get swizzled automatically on launch with the TargetClass
-ZKSwizzleInterface(ReplacementObject, OriginalObject, NSObject)
-@implmentation ReplacementObject
+hook(OriginalObject)
 // Returns YES
 + (BOOL)isSubclassOfClass:(Class)aClass { return _orig(BOOL); }
 
@@ -49,7 +48,7 @@ ZKSwizzleInterface(ReplacementObject, OriginalObject, NSObject)
 // This method is added to instances of OriginalObject and can be called
 // like any normal function on OriginalObject
 - (void)addedMethod { NSLog(@"this method was added to OriginalObject"); }
-@end
+endhook
 ```
 
 	
