@@ -142,6 +142,10 @@ id bloxecute(id (^block)()) {
 // Swizzled Group
 hook(GroupClass, Yosemite)
 
++ (BOOL)_ZK_ignoreTypes {
+    return YES;
+}
+
 + (NSString *)classMethod {
     return @"swizzled";
 }
@@ -164,8 +168,6 @@ hook(GroupClass, Mavericks)
 }
 
 endhook
-
-#define ctor __attribute__((constructor)) void init()
 
 ctor {
     ZKSwizzleGroup(Yosemite);

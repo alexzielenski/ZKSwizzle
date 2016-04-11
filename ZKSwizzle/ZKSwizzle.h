@@ -136,6 +136,8 @@
 #define hook(...) _HOOK(VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
 #define ctor __attribute__((constructor)) void init()
 
+#define ZKIgnoreTypes +(BOOL)_ZK_ignoreTypes { return YES; }
+
 __BEGIN_DECLS
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -11,6 +11,7 @@ static NSMutableDictionary *classTable;
 
 @interface NSObject (ZKSwizzle)
 + (void)_ZK_unconditionallySwizzle;
++ (BOOL)_ZK_ignoreTypes;
 @end
 
 void *ZKIvarPointer(id self, const char *name) {
@@ -177,7 +178,20 @@ BOOL _ZKSwizzleClass(Class cls) {
     return _ZKSwizzle(cls, [cls superclass]);
 }
 
-static BOOL enumerateMethods(Class destination, Class source) {
+static BOOL classIgnoresTypes(Class cls) {
+    if (!class_isMetaClass(cls)) {
+        cls = object_getClass(cls);
+    }
+    
+    if (class_respondsToSelector(cls, @selector(_ZK_ignoreTypes))) {
+        Class cls2 = class_createInstance(cls, 0);
+        return [cls2 _ZK_ignoreTypes];
+    }
+    
+    return NO;
+}
+
+static BOOL enumerateMethods(Class destination, Class source) {    
 #if OBJC_API_VERSION < 2
     [NSException raise:@"Unsupported feature" format:@"ZKSwizzle is only available in objc 2.0"];
     return NO;
@@ -187,13 +201,16 @@ static BOOL enumerateMethods(Class destination, Class source) {
     unsigned int methodCount;
     Method *methodList = class_copyMethodList(source, &methodCount);
     BOOL success = YES;
+    BOOL ignoreTypes = classIgnoresTypes(source);
+    
     for (int i = 0; i < methodCount; i++) {
         Method method = methodList[i];
         SEL selector  = method_getName(method);
         NSString *methodName = NSStringFromSelector(selector);
         
         // Don't do anything with the unconditional swizzle
-        if (sel_isEqual(selector, @selector(_ZK_unconditionallySwizzle))) {
+        if (sel_isEqual(selector, @selector(_ZK_unconditionallySwizzle)) ||
+            sel_isEqual(selector, @selector(_ZK_ignoreTypes))) {
             continue;
         }
         
@@ -203,7 +220,7 @@ static BOOL enumerateMethods(Class destination, Class source) {
             
             const char *originalType = method_getTypeEncoding(originalMethod);
             const char *newType = method_getTypeEncoding(method);
-            if (strcmp(originalType, newType) != 0) {
+            if (strcmp(originalType, newType) != 0 && !ignoreTypes) {
                 NSLog(@"ZKSwizzle: incompatible type encoding for %@. (expected %s, got %s)", methodName, originalType, newType);
                 // Incompatible type encoding
                 success = NO;
