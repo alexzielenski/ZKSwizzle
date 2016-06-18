@@ -46,7 +46,7 @@ static Class classFromInfo(const char *info) {
             after_bracket[i] = '\0';
         }
     }
-
+    
     return objc_getClass(after_bracket);
 }
 
@@ -78,6 +78,11 @@ ZKIMP ZKOriginalImplementation(id self, SEL sel, const char *info) {
     Method method =  class_getInstanceMethod(dest, destSel);
     
     if (method == NULL) {
+        if (![NSStringFromClass(cls) isEqualToString:NSStringFromClass([self class])]) {
+            // There is no implementation at this class level. Call the super implementation
+            return ZKSuperImplementation(self, sel, info);
+        }
+        
         [NSException raise:@"Failed to retrieve method" format:@"Got null for the source class %@ with selector %@ (%@)", NSStringFromClass(cls), NSStringFromSelector(sel), NSStringFromSelector(destSel)];
         return NULL;
     }
@@ -125,7 +130,7 @@ ZKIMP ZKSuperImplementation(id object, SEL sel, const char *info) {
     }
     
     cls = class_getSuperclass(cls);
-
+    
     // This is a root class, it has no super class
     if (cls == NULL) {
         [NSException raise:@"Invalid Argument" format:@"Could not obtain superclass for the passed object"];
@@ -191,7 +196,7 @@ static BOOL classIgnoresTypes(Class cls) {
     return NO;
 }
 
-static BOOL enumerateMethods(Class destination, Class source) {    
+static BOOL enumerateMethods(Class destination, Class source) {
 #if OBJC_API_VERSION < 2
     [NSException raise:@"Unsupported feature" format:@"ZKSwizzle is only available in objc 2.0"];
     return NO;
@@ -227,17 +232,29 @@ static BOOL enumerateMethods(Class destination, Class source) {
                 continue;
             }
             
-            // We are re-adding the destination selector because it could be on a superclass and not on the class itself. This method could fail
-            class_addMethod(destination, selector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
+            Method superImp = class_getInstanceMethod(class_getSuperclass(destination), selector);
             
-            SEL destSel = destinationSelectorForSelector(selector, source);
-            if (!class_addMethod(destination, destSel, method_getImplementation(method), method_getTypeEncoding(originalMethod))) {
-                NSLog(@"ZKSwizzle: failed to add method %@ onto class %@ with selector %@", NSStringFromSelector(selector), NSStringFromClass(source), NSStringFromSelector(destSel));
-                success = NO;
-                continue;
+            if (originalMethod != superImp) {
+                // We are re-adding the destination selector because it could be on a superclass and not on the class itself. This method could fail
+                class_addMethod(destination, selector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
+                
+                SEL destSel = destinationSelectorForSelector(selector, source);
+                if (!class_addMethod(destination, destSel, method_getImplementation(method), method_getTypeEncoding(originalMethod))) {
+                    NSLog(@"ZKSwizzle: failed to add method %@ onto class %@ with selector %@", NSStringFromSelector(selector), NSStringFromClass(source), NSStringFromSelector(destSel));
+                    success = NO;
+                    continue;
+                }
+                
+                method_exchangeImplementations(class_getInstanceMethod(destination, selector), class_getInstanceMethod(destination, destSel));
+            } else {
+                // If the method we are hooking is not implemented on the subclass at hook-time,
+                // we want orig calls from those hooks to go to the superclass. (ZKOriginalImplementation
+                //    redirects to ZKSuperImplementation when destinationSelectorForSelector() is not implemented
+                //    on the target class, that, combined with the fact that ZKOrig is called from a hook, means
+                //    calls should redirect to super)
+                success &= class_addMethod(destination, selector, method_getImplementation(method), method_getTypeEncoding(method));
             }
             
-            method_exchangeImplementations(class_getInstanceMethod(destination, selector), class_getInstanceMethod(destination, destSel));
         } else {
             // Add any extra methods to the class but don't swizzle them
             success &= class_addMethod(destination, selector, method_getImplementation(method), method_getTypeEncoding(method));

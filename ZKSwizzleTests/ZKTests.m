@@ -122,6 +122,30 @@ id bloxecute(id (^block)()) {
 
 @end
 
+@interface OtherClass : DummyClass
+@end
+
+@implementation OtherClass
+
+
+@end
+
+hook(OtherClass)
+
+- (NSString *)description {
+    return [ZKOrig(NSString *) stringByAppendingString:@" 2"];
+}
+
+endhook
+
+hook(DummyClass)
+
+- (NSString *)description {
+    return @"DummyClass_hooked";
+}
+
+endhook
+
 @interface GroupClass : NSObject
 + (NSString *)classMethod;
 - (NSString *)instanceMethod;
@@ -195,7 +219,8 @@ ctor {
     XCTAssertEqualObjects([instance selectorName], @"BREH: selectorName", @"_cmd correct on original imps");
     XCTAssertEqual([instance ivar], 3, @"hooking ivars");
     XCTAssertEqual([instance addedMethod], @"hi", @"adding methods");
-    XCTAssertEqualObjects([[[NewClass alloc] init] description], @"DummyClass", @"ZKSuper outside of swizzling");
+    XCTAssertEqualObjects([[[NewClass alloc] init] description], @"DummyClass_hooked", @"ZKSuper outside of swizzling");
+    XCTAssertEqualObjects([[[OtherClass alloc] init] description], @"DummyClass_hooked 2");
 }
 
 - (void)testGroups {
